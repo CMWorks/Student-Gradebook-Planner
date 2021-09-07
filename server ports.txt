@@ -1,0 +1,3 @@
+json server: 	5000
+build server:	4000
+devop server:	3000
