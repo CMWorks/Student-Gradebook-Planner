@@ -4,6 +4,11 @@ Download it and cd into the main directory
 
 'npm install' to install all dependencies
 
+# Server
+
+In src/server, there is a bash command called server.cmd
+Run it to start the server, or run it's content if not on windows
+
 ## Bash commands
 
 In the project directory, you can run:
