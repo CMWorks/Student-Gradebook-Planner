@@ -35,31 +35,30 @@ class Signup extends React.Component {
     // document.getElementById("passwordInput").value = ""
 
     let userdata = {
-			email: this.state.email,
-			password: this.state.password
-		}
+      eHash: this.props.server.generateHash(this.state.email, ""),
+      iHash: this.props.server.generateHash(this.state.email, this.state.password)
+    }
 
-    if (this.state.email === "" || this.state.password === "" || this.state.firstName === "" || this.state.lastName === ""){
+    if (this.state.email === "" || this.state.password === "" || this.state.firstName === "" || this.state.lastName === "") {
       event.preventDefault();
       return
     }
 
-		this.props.server.register(userdata).then((data) => {
+    this.props.server.register(userdata).then((data) => {
       if (data.status === 401) {
         document.getElementById("emailInput").classList.add("is-invalid")
       } else {
         this.props.server.token = data.access_token;
-        this.props.server.hash = data.hash;
         this.props.server.myHeaders = {
           'Content-Type': 'application/json',
-          'Authorization': ('Bearer ' + this.props.server.token)
+          'Authorization': ('Bearer ' + data.access_token)
         }
-      
+
         let User = {
           firstName: this.state.firstName,
           lastName: this.state.lastName,
           email: this.state.email,
-          userID: data.hash,
+          userID: userdata.iHash,
           semesters: []
         }
 
