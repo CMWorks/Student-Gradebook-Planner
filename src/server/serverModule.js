@@ -70,13 +70,16 @@ class serverModule {
 	updates user with new data
 	NOTE: id is different from userID, this is the databse id
 	you guys will only use this function to update
+	returns the responce from server
 	*/
 	updateUser = async (id, data) => {
-		await fetch('http://localhost:5000/users/' + id, {
+		const res = await fetch('http://localhost:5000/users/' + id, {
 			method: 'PUT',
 			headers: this.myHeaders,
 			body: JSON.stringify(data)
 		})
+		const data = await res.json()
+		return data
 	}
 
 	authenticate = async (eHash, idHash) => {
