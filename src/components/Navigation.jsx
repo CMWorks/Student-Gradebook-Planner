@@ -28,6 +28,11 @@ function Navigation(props) {
                   Contact
                 </Link>
               </li>
+              <li className={`nav-item`}>
+                <Link className={'nav-link ' + (props.location.pathname === "/semesters" ? "active" : "")} to="/semesters">
+                  Semesters
+                </Link>
+              </li>
             </ul>
           </div>
         </div>

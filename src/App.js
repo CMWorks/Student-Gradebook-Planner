@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { Navigation, Footer, Home, About, Contact, Login, Signup } from "./components";
+import { Navigation, Footer, Home, About, Contact, Login, Signup, Semesters } from "./components";
 import serverModule from "./server/serverModule";
 
 class App extends React.Component {
@@ -11,7 +11,7 @@ class App extends React.Component {
     this.server.obj = "App"
     this.baseLocation = "http://localhost:3000/"
     this.state = {
-      mode: "Login",
+      mode: "Entered",
       user: {}
     }
   }
@@ -31,6 +31,7 @@ class App extends React.Component {
               <Route path="/" exact component={() => <Home data={this.server.obj} set={(data) => this.setData(data)} />} />
               <Route path="/about" exact component={() => <About data={this.server.obj} set={(data) => this.setData(data)} />} />
               <Route path="/contact" exact component={() => <Contact data={this.server.obj} set={(data) => this.setData(data)} />} />
+              <Route path="/semesters" exact component={() => <Semesters data={this.server.obj} set={(data) => this.setData(data)} />} />
             </Switch>
             <Footer />
           </Router>
