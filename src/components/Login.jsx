@@ -22,18 +22,20 @@ class Login extends React.Component {
     document.getElementById("emailInput").value = ""
     document.getElementById("passwordInput").value = ""
 
-    this.props.server.authenticate(this.state.email, this.state.password).then((data) => {
-      if (data.status === 401) {
+    var eHash = this.props.server.generateHash(this.state.email, "")
+    var iHash = this.props.server.generateHash(this.state.email, this.state.password)
+
+    this.props.server.authenticate(eHash, iHash).then((dataA) => {
+      if (dataA.status === 401) {
         document.getElementById("passwordInput").classList.add("is-invalid")
         document.getElementById("emailInput").classList.add("is-invalid")
       } else {
-        this.props.server.token = data.access_token;
-        this.props.server.hash = data.hash;
+        this.props.server.token = dataA.access_token;
         this.props.server.myHeaders = {
           'Content-Type': 'application/json',
-          'Authorization': ('Bearer ' + this.props.server.token)
+          'Authorization': ('Bearer ' + dataA.access_token)
         }
-        this.props.server.get(data.hash).then((data) => {
+        this.props.server.get(iHash).then((data) => {
           this.props.set({ mode: "Entered", user: data[0] })
         })
       }
