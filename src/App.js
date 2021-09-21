@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { Navigation, Footer, Home, About, Contact, Login, Signup } from "./components";
+import { Navigation, Footer, Home, About, Contact, Login, Signup, Semesters } from "./components";
 import serverModule from "./server/serverModule";
 
 class App extends React.Component {
@@ -56,6 +56,7 @@ class App extends React.Component {
               <Route path="/" exact component={() => <Home userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
               <Route path="/about" exact component={() => <About userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
               <Route path="/contact" exact component={() => <Contact userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
+              <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} updateUser={(data) => this.updateUser(data)} />} />
             </Switch>
             <Footer />
           </Router>
