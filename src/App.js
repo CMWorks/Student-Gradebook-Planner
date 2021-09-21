@@ -11,7 +11,7 @@ class App extends React.Component {
     this.server.obj = "App"
     this.baseLocation = "http://localhost:3000/"
     this.state = {
-      mode: "Login",
+      mode: "Entered",
       user: {}
     }
   }
@@ -24,7 +24,7 @@ class App extends React.Component {
    */
   updateUser(data) {
     this.setState({ user: data })
-    this.server.updateUser(data.id, data).then((res) => {
+    /*this.server.updateUser(data.id, data).then((res) => {
       // authorizaiton token expired
       if (res.status === 401) {
         var eHash = this.server.generateHash(data.email, "")
@@ -43,7 +43,7 @@ class App extends React.Component {
           }
         })
       }
-    })
+    })*/
   }
 
   render() {
@@ -53,9 +53,9 @@ class App extends React.Component {
           <Router>
             <Navigation />
             <Switch>
-              <Route path="/" exact component={() => <Home data={this.server.obj} set={(data) => this.updateUser(data)} />} />
-              <Route path="/about" exact component={() => <About data={this.server.obj} set={(data) => this.updateUser(data)} />} />
-              <Route path="/contact" exact component={() => <Contact data={this.server.obj} set={(data) => this.updateUser(data)} />} />
+              <Route path="/" exact component={() => <Home userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
+              <Route path="/about" exact component={() => <About userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
+              <Route path="/contact" exact component={() => <Contact userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
             </Switch>
             <Footer />
           </Router>
