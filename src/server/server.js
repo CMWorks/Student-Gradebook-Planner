@@ -2,7 +2,6 @@ const fs = require('fs')
 const bodyParser = require('body-parser')
 const jsonServer = require('json-server')
 const jwt = require('jsonwebtoken')
-const crypto = require('crypto')
 
 const server = jsonServer.create()
 const router = jsonServer.router('./db.json')
@@ -18,10 +17,6 @@ const AUTH_ON = true
 const USER_ID_REQ = '/?userID_like='
 
 const expiresIn = '1h'
-
-function generateHash(email, password) {
-  return crypto.createHash('sha512').update(email + password).digest('hex')
-}
 
 function cleanQuery(query) {
   let a = query.split("_like=")[1]
@@ -50,22 +45,23 @@ function verifyToken(token) {
   return jwt.verify(token, SECRET_KEY, (err, decode) => decode !== undefined ? decode : err)
 }
 
-// Check if the user exists in database
-function isAuthenticated({ email, password }) {
-  return userdb.users.findIndex(user => user.email === email) !== -1
+// Check if the user already exists in database
+function isAuthenticated({ eHash, iHash }) {
+  return userdb.users.findIndex(user => user.eHash === eHash || user.iHash === iHash) !== -1
 }
 
-function isAuthenticatedFull({ email, password }) {
-  return userdb.users.findIndex(user => user.email === email && user.password === password) !== -1
+// Check if the users full cradentials is correct
+function isAuthenticatedFull({ eHash, iHash }) {
+  return userdb.users.findIndex(user => user.eHash === eHash && user.iHash === iHash) !== -1
 }
 
 // Register New User
 server.post('/auth/register', (req, res) => {
   console.log("register endpoint called; request body:");
   console.log(req.body);
-  const { email, password } = req.body;
+  const { eHash, iHash } = req.body;
 
-  if (isAuthenticated({ email, password }) === true) {
+  if (isAuthenticated({ eHash, iHash }) === true) {
     const status = 401;
     const message = 'Email already exist';
     res.status(status).json({ status, message });
@@ -88,7 +84,7 @@ server.post('/auth/register', (req, res) => {
     var last_item_id = data.users[data.users.length - 1].id;
 
     //Add new user
-    data.users.push({ id: last_item_id + 1, email: email, password: password }); //add some data
+    data.users.push({ id: last_item_id + 1, eHash: eHash, iHash: iHash }); //add some data
     userdb = data
     var writeData = fs.writeFile("./users.json", JSON.stringify(data), (err, result) => {  // WRITE
       if (err) {
@@ -101,27 +97,25 @@ server.post('/auth/register', (req, res) => {
   });
 
   // Create token for new user
-  const access_token = createToken({ email, password })
-  var hash = generateHash(email, password);
+  const access_token = createToken({ eHash, iHash })
   console.log("Access Token:" + access_token);
-  res.status(200).json({ access_token, hash })
+  res.status(200).json({ access_token })
 })
 
 // Login to one of the users from ./users.json
 server.post('/auth/login', (req, res) => {
   console.log("login endpoint called; request body:");
   console.log(req.body);
-  const { email, password } = req.body;
-  if (isAuthenticatedFull({ email, password }) === false) {
+  const { eHash, iHash } = req.body;
+  if (isAuthenticatedFull({ eHash, iHash }) === false) {
     const status = 401
     const message = 'Incorrect email or password'
     res.status(status).json({ status, message })
     return
   }
-  const access_token = createToken({ email, password })
-  var hash = generateHash(email, password);
+  const access_token = createToken({ eHash, iHash })
   console.log("Access Token:" + access_token);
-  res.status(200).json({ access_token, hash })
+  res.status(200).json({ access_token })
 
   // crypto.randomBytes(32, (err, salt) => {
   //   if (err) throw err;
@@ -141,8 +135,7 @@ server.use(/^(?!\/auth).*$/, (req, res, next) => {
   if ("userID_like" in req.query && req.url.includes(USER_ID_REQ)) {
     req.query.userID_like = cleanQuery(req.url)
   }
-  else
-  {
+  else {
     req.query.userID_like = "^$"
   }
 
