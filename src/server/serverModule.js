@@ -72,11 +72,11 @@ class serverModule {
 	you guys will only use this function to update
 	returns the responce from server
 	*/
-	updateUser = async (id, data) => {
+	updateUser = async (id, new_data) => {
 		const res = await fetch('http://localhost:5000/users/' + id, {
 			method: 'PUT',
 			headers: this.myHeaders,
-			body: JSON.stringify(data)
+			body: JSON.stringify(new_data)
 		})
 		const data = await res.json()
 		return data
