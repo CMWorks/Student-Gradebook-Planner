@@ -57,6 +57,7 @@ class App extends React.Component {
               <Route path="/about" exact component={() => <About userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
               <Route path="/contact" exact component={() => <Contact userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
               <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} updateUser={(data) => this.updateUser(data)} />} />
+              <Route path="/final-grade-calculator" exact component={() => <FinalGradeCalculator />} />
             </Switch>
             <Footer />
           </Router>
