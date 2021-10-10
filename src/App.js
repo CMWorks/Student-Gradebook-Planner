@@ -1,13 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Navigation, Footer, Home, About, Contact, Login, Signup, Semesters } from "./components";
-import serverModule from "./server/serverModule";
+import RESTModule from "./server/wpRESTModule";
 
 class App extends React.Component {
 
   constructor(props) {
     super(props)
-    this.server = new serverModule();
+    this.server = new RESTModule();
     this.server.obj = "App"
     this.baseLocation = "http://localhost:3000/"
     this.state = {

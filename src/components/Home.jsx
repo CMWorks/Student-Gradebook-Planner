@@ -3,6 +3,15 @@ import React from "react";
 class Home extends React.Component {
 
   render() {
+    var myHeaders = {
+			'Content-Type': 'application/json',
+			Authorization: 'Bearer 12345'
+		}
+
+			fetch('http://127.0.0.1:5000/companies', {
+				headers: myHeaders
+			}).then(res => res.json().then(data => console.log(data)))
+
     return (
       <div className="home">
         <div className="container">
