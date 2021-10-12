@@ -1,13 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { Navigation, Footer, Home, About, Contact, Login, Signup, Semesters } from "./components";
-import serverModule from "./server/serverModule";
+import RESTModule from "./server/wpRESTModule";
 
 class App extends React.Component {
 
   constructor(props) {
     super(props)
-    this.server = new serverModule();
+    this.server = new RESTModule();
     this.server.obj = "App"
     this.baseLocation = "http://localhost:3000/"
     this.state = {
@@ -53,10 +53,10 @@ class App extends React.Component {
           <Router>
             <Navigation />
             <Switch>
-              <Route path="/" exact component={() => <Home userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
-              <Route path="/about" exact component={() => <About userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
-              <Route path="/contact" exact component={() => <Contact userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
-              <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} updateUser={(data) => this.updateUser(data)} />} />
+              <Route path="/" exact component={() => <Home userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
+              <Route path="/about" exact component={() => <About userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
+              <Route path="/contact" exact component={() => <Contact userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
+              <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
               <Route path="/final-grade-calculator" exact component={() => <FinalGradeCalculator />} />
             </Switch>
             <Footer />
