@@ -33,6 +33,11 @@ function Navigation(props) {
                   Semesters
                 </Link>
               </li>
+              <li className={'nav-item'}>
+                <Link className={'nav-link ' + (props.location.pathname === "/final-grade-calculator" ? "active" : "")} to="/final-grade-calculator">
+                  Final Grade Calculator
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
