@@ -53,10 +53,10 @@ class App extends React.Component {
           <Router>
             <Navigation />
             <Switch>
-              <Route path="/" exact component={() => <Home userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
-              <Route path="/about" exact component={() => <About userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
-              <Route path="/contact" exact component={() => <Contact userData={this.state.user} setUserData={(data) => this.updateUser(data)} />} />
-              <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} updateUser={(data) => this.updateUser(data)} />} />
+              <Route path="/" exact component={() => <Home userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
+              <Route path="/about" exact component={() => <About userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
+              <Route path="/contact" exact component={() => <Contact userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
+              <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
             </Switch>
             <Footer />
           </Router>

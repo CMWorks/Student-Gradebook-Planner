@@ -120,7 +120,8 @@ class RESTModule {
 	}
 
 	generateHash(email, password) {
-		return crypto.createHash('sha512').update(email + password).digest('hex')
+		return crypto.createHash('sha256').update(email + password).digest('base64')
+		// return parseInt( crypto.createHash('sha256').update(email + password).digest('hex').split('').reverse().join(''), 16);
 	}
 
 	constructor() {
