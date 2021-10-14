@@ -57,6 +57,7 @@ class RESTModule {
 	}
 
 	getUserData = async (table, id) => {
+		console.log(this.myHeaders)
 		const res = await fetch(this.serverLocation + this.apiVersion + table + "/" + id, {
 			headers: this.myHeaders
 		})

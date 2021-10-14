@@ -11,7 +11,7 @@ class App extends React.Component {
     this.server.obj = "App"
     this.baseLocation = "http://localhost:3000/"
     this.state = {
-      mode: "Entered",
+      mode: "Login",
       user: {}
     }
   }

@@ -45,13 +45,13 @@ class Signup extends React.Component {
     }
 
     this.props.server.register(userdata).then((data) => {
-      if (data.status === 401) {
+      if (!data.success) {
         document.getElementById("emailInput").classList.add("is-invalid")
       } else {
-        this.props.server.token = data.access_token;
+        this.props.server.token = data.token;
         this.props.server.myHeaders = {
           'Content-Type': 'application/json',
-          'Authorization': ('Bearer ' + data.access_token)
+          'Authorization': ('Bearer ' + data.token)
         }
 
         let User = {
@@ -62,7 +62,7 @@ class Signup extends React.Component {
           semesters: []
         }
 
-        this.props.server.addUser(User).then((dataBack) => {
+        this.props.server.addUserData('users', User.userID, User).then((dataBack) => {
           this.props.set({ mode: "Entered", user: dataBack })
         })
       }
