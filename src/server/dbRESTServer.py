@@ -8,7 +8,8 @@ api = Flask(__name__)
 white = ['http://localhost:3000', 'http://localhost:9000']
 
 
-db = SQLQuery("database/sqlData.txt")
+# db = SQLQuery("database/sqlData.txt")
+db = SQLQuery.getDbQuery("database/sqlData.txt")
 auth = JWTAuth(db)
 
 
@@ -102,7 +103,8 @@ def get_all_semester():
     query = request.query_string.decode('UTF-8').split('=')
     if len(query) is not 2:
         return {'success': False}, 403
-    foreign_key = query[1]
+    keyname = query[0]
+    key = query[1]
     return {'success': True}, 200
 
 
@@ -148,7 +150,8 @@ def get_all_future_course():
     query = request.query_string.decode('UTF-8').split('=')
     if len(query) is not 2:
         return {'success': False}, 403
-    foreign_key = query[1]
+    keyname = query[0]
+    key = query[1]
     return {'success': True}, 200
 
 
@@ -194,7 +197,8 @@ def get_all_current_course():
     query = request.query_string.decode('UTF-8').split('=')
     if len(query) is not 2:
         return {'success': False}, 403
-    foreign_key = query[1]
+    keyname = query[0]
+    key = query[1]
     return {'success': True}, 200
 
 
@@ -240,7 +244,8 @@ def get_all_category():
     query = request.query_string.decode('UTF-8').split('=')
     if len(query) is not 2:
         return {'success': False}, 403
-    foreign_key = query[1]
+    keyname = query[0]
+    key = query[1]
     return {'success': True}, 200
 
 
@@ -286,7 +291,8 @@ def get_all_assignment():
     query = request.query_string.decode('UTF-8').split('=')
     if len(query) is not 2:
         return {'success': False}, 403
-    foreign_key = query[1]
+    keyname = query[0]
+    key = query[1]
     return {'success': True}, 200
 
 

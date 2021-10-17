@@ -48,8 +48,8 @@ class RESTModule {
 	// 	})
 	// }
 
-	getAllFromTable = async (table, foreignKey) => {
-		const res = await fetch(this.serverLocation + this.apiVersion + table + "?foreignKey="+foreignKey, {
+	getAllFromTable = async (table, keyname, key) => {
+		const res = await fetch(this.serverLocation + this.apiVersion + table + "?"+keyname+"="+key, {
 			headers: this.myHeaders
 		})
 		const data = await res.json()
@@ -57,7 +57,6 @@ class RESTModule {
 	}
 
 	getUserData = async (table, id) => {
-		console.log(this.myHeaders)
 		const res = await fetch(this.serverLocation + this.apiVersion + table + "/" + id, {
 			headers: this.myHeaders
 		})

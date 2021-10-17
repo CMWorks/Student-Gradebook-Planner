@@ -7,11 +7,18 @@ class SQLQuery(DbQuery):
 
     db = None
 
-    # @staticmethod
-    # def getDbQuery(path):
-    #     if SQLQuery.db is None:
-    #         SQLQuery.db = SQLQuery(path)
-    #     return SQLQuery.db
+    def __data_to_dict(self, data):
+        out = []
+        for row in data:
+            out.append(row)
+        self.conn.close()
+        return out
+
+    @staticmethod
+    def getDbQuery(path):
+        if SQLQuery.db is None:
+            SQLQuery.db = SQLQuery(path)
+        return SQLQuery.db
 
     def __init__(self, path):
         self.dbConnect = SQLConnection()
@@ -24,10 +31,10 @@ class SQLQuery(DbQuery):
             f"select * from {table} where {id_name}='{id}'")
         return self.__data_to_dict(data)
 
-    def add(self, table, data):
+    def add(self, table, listData: list):
         self.conn = self.dbConnect.connect(self.path)
         command = f"insert into {table} values("
-        for key, value in data.items():
+        for value in listData:
             command += f"'{value}',"
 
         # remove the last comma and add ending )
@@ -42,10 +49,10 @@ class SQLQuery(DbQuery):
         self.conn.close()
         return True
 
-    def update(self, table, data):
+    def update(self, table, dicData: dict):
         self.conn = self.dbConnect.connect(self.path)
         command = f"update {table} set "
-        for key, value in data.items():
+        for key, value in dicData.items():
             command += f"{key} = '{value}',"
 
         # remove the last comma and add ending )
@@ -70,10 +77,3 @@ class SQLQuery(DbQuery):
         self.conn.commit()
         self.conn.close()
         return True
-
-    def __data_to_dict(self, data):
-        out = []
-        for row in data:
-            out.append(row)
-        self.conn.close()
-        return out
