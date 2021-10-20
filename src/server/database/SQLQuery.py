@@ -7,7 +7,7 @@ class SQLQuery(DbQuery):
 
     db = None
 
-    def __data_to_dict(self, data):
+    def __data_to_dict(self, data) -> list:
         out = []
         for row in data:
             out.append(row)

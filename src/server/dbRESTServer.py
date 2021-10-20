@@ -1,7 +1,15 @@
 from flask import Flask, request, jsonify
 import json
+
+from flask.wrappers import Response
 from database.SQLQuery import SQLQuery
 from auth.jwtAuth import JWTAuth
+from obj.User import User
+from obj.Semester import Semester
+from obj.CurrentCourse import CurrentCourse
+from obj.FutureCourse import FutureCourse
+from obj.Category import Category
+from obj.Assignment import Assignment
 
 api = Flask(__name__)
 
@@ -14,7 +22,7 @@ auth = JWTAuth(db)
 
 
 @api.after_request
-def add_cors_headers(response):
+def add_cors_headers(response:Response):
     if request.referrer is None:
         return response
     r = request.referrer[:-1]
@@ -34,6 +42,7 @@ def add_cors_headers(response):
 def check_authorization():
     token = request.headers.get("authorization")
     if token is None or 'Bearer ' not in token:
+        print("Not authorized to talk to database")
         return False
     success = auth.verify(token[7:])
     return success
@@ -44,6 +53,7 @@ def register_user():
     data = json.loads(request.data.decode('UTF-8'))
     token = auth.register(data['eHash'], data['iHash'])
     if token is False:
+        print("Registeration Info Already Being Used")
         return {'success': False}, 401
     else:
         print(f"\033[34mNew Token: {token}\033[0m")
@@ -55,6 +65,7 @@ def login_user():
     data = json.loads(request.data.decode('UTF-8'))
     token = auth.login(data['eHash'], data['iHash'])
     if token is False:
+        print("Wrong Login Info")
         return {'success': False}, 401
     else:
         print(f"\033[34m New Token: {token}\033[0m")
@@ -66,24 +77,44 @@ def get_user(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    return {'success': True}, 200
+    user = User.getUser(db, id)
+    if user is None:
+        print("No user found")
+        return {'success': False, 'message': 'Not Found'}, 404
+
+    print('User found')
+    return {'success': True, 'data': user.toJson()}, 200
 
 
-@api.route('/v1/users/<id>', methods=['POST'])
-def add_user(id):
+@api.route('/v1/users', methods=['POST'])
+def add_user():
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    user = User(db, data)
+    success = user.addUser()
+    if not success:
+        print("unsuccessful to add user")
+        return {'success': False, 'message': 'Not Found'}, 404
+
+    print('successsfully added user')
     return {'success': True}, 200
 
 
 @api.route('/v1/users/<id>', methods=['PUT'])
-def update_user(id):
+def update_user():
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    user = User(db, data)
+    success = user.updateUser()
+    if not success:
+        print("unsuccessful to update user")
+        return {'success': False, 'message': 'Not Found'}, 404
+
+    print('successsfully updated user')
     return {'success': True}, 200
 
 
@@ -92,6 +123,13 @@ def delete_user(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
+
+    success = User.deleteUser(db, id)
+    if not success:
+        print("unsuccessful to delete user")
+        return {'success': False, 'message': 'Not Found'}, 404
+
+    print('successsfully deleted user')
     return {'success': True}, 200
 
 
@@ -105,7 +143,11 @@ def get_all_semester():
         return {'success': False}, 403
     keyname = query[0]
     key = query[1]
-    return {'success': True}, 200
+    semesters = Semester.getSemesters(db, keyname, key)
+    data = []
+    for sem in semesters:
+        data.append(sem.toJson())
+    return {'success': True, 'data': data}, 200
 
 
 @api.route('/v1/semesters/<id>', methods=['GET'])
@@ -113,15 +155,26 @@ def get_semester(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    return {'success': True}, 200
+    semester = Semester.getSemesters(db, 'semesterID', id)
+    if len(semester) != 1:
+        return {'success': False, 'message': 'Not Found'}, 404
+
+    return {'success': True, 'data': semester[0].toJson()}, 200
 
 
-@api.route('/v1/semesters/<id>', methods=['POST'])
-def add_semester(id):
+
+
+@api.route('/v1/semesters', methods=['POST'])
+def add_semester():
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    sem = Semester(db, data)
+    success = sem.addSemester()
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -131,6 +184,11 @@ def update_semester(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    sem = Semester(db, data)
+    success = sem.updateSemester()
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -139,6 +197,10 @@ def delete_semester(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
+    success = Semester.deleteSemesters(db, 'semesterID', id)
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -152,7 +214,11 @@ def get_all_future_course():
         return {'success': False}, 403
     keyname = query[0]
     key = query[1]
-    return {'success': True}, 200
+    fCourse = FutureCourse.getCourses(db, keyname, key)
+    data = []
+    for course in fCourse:
+        data.append(course.toJson())
+    return {'success': True, 'data': data}, 200
 
 
 @api.route('/v1/futureCourses/<id>', methods=['GET'])
@@ -160,15 +226,24 @@ def get_future_course(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    return {'success': True}, 200
+    course = FutureCourse.getCourses(db, 'courseID', id)
+    if len(course) != 1:
+        return {'success': False, 'message': 'Not Found'}, 404
+
+    return {'success': True, 'data': course[0].toJson()}, 200
 
 
-@api.route('/v1/futureCourses/<id>', methods=['POST'])
-def add_future_course(id):
+@api.route('/v1/futureCourses', methods=['POST'])
+def add_future_course():
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    course = FutureCourse(db, data)
+    success = course.addCourse()
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -178,6 +253,11 @@ def update_future_course(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    course = FutureCourse(db, data)
+    success = course.updateCourse()
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -186,6 +266,10 @@ def delete_future_course(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
+    success = FutureCourse.deleteCourses(db, 'courseID', id)
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -199,7 +283,11 @@ def get_all_current_course():
         return {'success': False}, 403
     keyname = query[0]
     key = query[1]
-    return {'success': True}, 200
+    cCourse = CurrentCourse.getCourses(db, keyname, key)
+    data = []
+    for course in cCourse:
+        data.append(course.toJson())
+    return {'success': True, 'data': data}, 200
 
 
 @api.route('/v1/currentCourses/<id>', methods=['GET'])
@@ -207,15 +295,24 @@ def get_current_course(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    return {'success': True}, 200
+    course = CurrentCourse.getCourses(db, 'courseID', id)
+    if len(course) != 1:
+        return {'success': False, 'message': 'Not Found'}, 404
+
+    return {'success': True, 'data': course[0].toJson()}, 200
 
 
-@api.route('/v1/currentCourses/<id>', methods=['POST'])
-def add_current_course(id):
+@api.route('/v1/currentCourses', methods=['POST'])
+def add_current_course():
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    course = CurrentCourse(db, data)
+    success = course.addCourse()
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -225,6 +322,11 @@ def update_current_course(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    course = CurrentCourse(db, data)
+    success = course.updateCourse()
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -233,6 +335,10 @@ def delete_current_course(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
+    success = CurrentCourse.deleteCourses(db, 'courseID', id)
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -246,7 +352,11 @@ def get_all_category():
         return {'success': False}, 403
     keyname = query[0]
     key = query[1]
-    return {'success': True}, 200
+    category = Category.getCategories(db, keyname, key)
+    data = []
+    for cat in category:
+        data.append(cat.toJson())
+    return {'success': True, 'data': data}, 200
 
 
 @api.route('/v1/categories/<id>', methods=['GET'])
@@ -254,15 +364,24 @@ def get_category(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    return {'success': True}, 200
+    category = Category.getCategories(db, 'categoryID', id)
+    if len(category) != 1:
+        return {'success': False, 'message': 'Not Found'}, 404
+
+    return {'success': True, 'data': category[0].toJson()}, 200
 
 
-@api.route('/v1/categories/<id>', methods=['POST'])
-def add_category(id):
+@api.route('/v1/categories', methods=['POST'])
+def add_category():
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    category = Category(db, data)
+    success = category.addCategory()
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -272,6 +391,11 @@ def update_category(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    category = Category(db, data)
+    success = category.updateCategory()
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -280,6 +404,10 @@ def delete_category(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
+    success = Category.deleteCategories(db, 'categoryID', id)
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -293,7 +421,11 @@ def get_all_assignment():
         return {'success': False}, 403
     keyname = query[0]
     key = query[1]
-    return {'success': True}, 200
+    assignment = Assignment.getAssignments(db, keyname, key)
+    data = []
+    for ment in assignment:
+        data.append(ment.toJson())
+    return {'success': True, 'data': data}, 200
 
 
 @api.route('/v1/assignments/<id>', methods=['GET'])
@@ -301,15 +433,24 @@ def get_assignment(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    return {'success': True}, 200
+    assignment = Assignment.getAssignments(db, 'assignmentID', id)
+    if len(assignment) != 1:
+        return {'success': False, 'message': 'Not Found'}, 404
+
+    return {'success': True, 'data': assignment[0].toJson()}, 200
 
 
-@api.route('/v1/assignments/<id>', methods=['POST'])
-def add_assignment(id):
+@api.route('/v1/assignments', methods=['POST'])
+def add_assignment():
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    assignment = Assignment(db, data)
+    success = assignment.addAssignment()
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -319,6 +460,11 @@ def update_assignment(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
+    assignment = Assignment(db, data)
+    success = assignment.updateAssignment()
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 
@@ -327,6 +473,10 @@ def delete_assignment(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
+    success = Assignment.deleteAssignments(db, 'assignmentID', id)
+    if not success:
+        return {'success': False, 'message': 'Not Found'}, 404
+
     return {'success': True}, 200
 
 

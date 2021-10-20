@@ -72,8 +72,8 @@ class RESTModule {
 	Adds user to database
 	returns the user with his id attached
 	*/
-	addUserData = async (table, id, data) => {
-		const res = await fetch(this.serverLocation + this.apiVersion + table + "/" + id, {
+	addUserData = async (table, data) => {
+		const res = await fetch(this.serverLocation + this.apiVersion + table, {
 			method: 'POST',
 			headers: this.myHeaders,
 			body: JSON.stringify(data)
@@ -120,7 +120,7 @@ class RESTModule {
 	}
 
 	generateHash(email, password) {
-		return crypto.createHash('sha256').update(email + password).digest('base64')
+		return crypto.createHash('sha256').update(email + password).digest('hex')
 		// return parseInt( crypto.createHash('sha256').update(email + password).digest('hex').split('').reverse().join(''), 16);
 	}
 

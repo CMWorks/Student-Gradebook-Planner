@@ -59,10 +59,10 @@ class Signup extends React.Component {
           lastName: this.state.lastName,
           email: this.state.email,
           userID: userdata.iHash,
-          semesters: []
+          totalGPA: 0,
         }
 
-        this.props.server.addUserData('users', User.userID, User).then((dataBack) => {
+        this.props.server.addUserData('users', User).then((dataBack) => {
           this.props.set({ mode: "Entered", user: dataBack })
         })
       }
