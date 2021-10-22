@@ -34,35 +34,32 @@ class Signup extends React.Component {
     // document.getElementById("emailInput").value = ""
     // document.getElementById("passwordInput").value = ""
 
-    let userdata = {
-      eHash: this.props.server.generateHash(this.state.email, ""),
-      iHash: this.props.server.generateHash(this.state.email, this.state.password)
-    }
+    let eHash = this.props.server.generateHash(this.state.email, "");
+    let idHash = this.props.server.generateHash(this.state.email, this.state.password);
+    let User = {
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        email: this.state.email,
+        userID: idHash,
+        totalGPA: 0,
+      }
 
     if (this.state.email === "" || this.state.password === "" || this.state.firstName === "" || this.state.lastName === "") {
       event.preventDefault();
       return
     }
 
-    this.props.server.register(userdata).then((data) => {
-      if (data.status === 401) {
+    this.props.server.register(eHash, idHash, User).then((data) => {
+      if (!data.success) {
         document.getElementById("emailInput").classList.add("is-invalid")
       } else {
-        this.props.server.token = data.access_token;
+        this.props.server.token = data.token;
         this.props.server.myHeaders = {
           'Content-Type': 'application/json',
-          'Authorization': ('Bearer ' + data.access_token)
+          'Authorization': ('Bearer ' + data.token)
         }
 
-        let User = {
-          firstName: this.state.firstName,
-          lastName: this.state.lastName,
-          email: this.state.email,
-          userID: userdata.iHash,
-          semesters: []
-        }
-
-        this.props.server.addUser(User).then((dataBack) => {
+        this.props.server.addUserData('users', User).then((dataBack) => {
           this.props.set({ mode: "Entered", user: dataBack })
         })
       }

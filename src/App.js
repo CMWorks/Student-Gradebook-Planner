@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { Navigation, Footer, Home, About, Contact, Login, Signup, Semesters } from "./components";
+import { Navigation, Footer, Home, About, Contact, Login, Signup, Semesters, FinalGradeCalculator } from "./components";
 import RESTModule from "./server/wpRESTModule";
 
 class App extends React.Component {
@@ -11,7 +11,7 @@ class App extends React.Component {
     this.server.obj = "App"
     this.baseLocation = "http://localhost:3000/"
     this.state = {
-      mode: "Entered",
+      mode: "Login",
       user: {}
     }
   }

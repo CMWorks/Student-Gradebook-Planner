@@ -48,8 +48,8 @@ class RESTModule {
 	// 	})
 	// }
 
-	getAllFromTable = async (table, foreignKey) => {
-		const res = await fetch(this.serverLocation + this.apiVersion + table + "?foreignKey="+foreignKey, {
+	getAllFromTable = async (table, keyname, key) => {
+		const res = await fetch(this.serverLocation + this.apiVersion + table + "?"+keyname+"="+key, {
 			headers: this.myHeaders
 		})
 		const data = await res.json()
@@ -72,8 +72,8 @@ class RESTModule {
 	Adds user to database
 	returns the user with his id attached
 	*/
-	addUserData = async (table, id, data) => {
-		const res = await fetch(this.serverLocation + this.apiVersion + table + "/" + id, {
+	addUserData = async (table, data) => {
+		const res = await fetch(this.serverLocation + this.apiVersion + table, {
 			method: 'POST',
 			headers: this.myHeaders,
 			body: JSON.stringify(data)
@@ -102,25 +102,30 @@ class RESTModule {
 		const res = await fetch(this.serverLocation + this.apiVersion + 'auth/login', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: '{"eHash":"' + eHash + '","iHash": "' + idHash + '"}',
+			body: '{"eHash":"' + eHash + '","idHash": "' + idHash + '"}',
 		})
 		const data = await res.json()
 		return data
 		//authenticate().then(function(object){t = object.access_token})
 	}
 
-	register = async (userdata) => {
+	register = async (eHash, idHash, userdata) => {
+        let outData = {
+            'eHash': eHash,
+            'idHash': idHash,
+            'user': userdata
+        }
 		const res = await fetch(this.serverLocation + this.apiVersion + 'auth/register', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(userdata),
+			body: JSON.stringify(outData),
 		})
 		const data = await res.json()
 		return data
 	}
 
 	generateHash(email, password) {
-		return crypto.createHash('sha256').update(email + password).digest('base64')
+		return crypto.createHash('sha256').update(email + password).digest('hex')
 		// return parseInt( crypto.createHash('sha256').update(email + password).digest('hex').split('').reverse().join(''), 16);
 	}
 
