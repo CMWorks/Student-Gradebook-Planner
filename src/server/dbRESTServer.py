@@ -51,24 +51,29 @@ def check_authorization():
 @api.route('/v1/auth/register', methods=['POST'])
 def register_user():
     data = json.loads(request.data.decode('UTF-8'))
-    token = auth.register(data['eHash'], data['iHash'])
+    user = User(db, data['user'])
+    token = user.addUser()
+    if token is False:
+        print("Registeration Info Already Being Used")
+        return {'success': False}, 401
+    token = auth.register(data['eHash'], data['idHash'])
     if token is False:
         print("Registeration Info Already Being Used")
         return {'success': False}, 401
     else:
-        print(f"\033[34mNew Token: {token}\033[0m")
+        print(f"New Token: {token}")
         return {'success': True, 'token': token}, 200
 
 
 @api.route('/v1/auth/login', methods=['POST'])
 def login_user():
     data = json.loads(request.data.decode('UTF-8'))
-    token = auth.login(data['eHash'], data['iHash'])
+    token = auth.login(data['eHash'], data['idHash'])
     if token is False:
         print("Wrong Login Info")
         return {'success': False}, 401
     else:
-        print(f"\033[34m New Token: {token}\033[0m")
+        print(f" New Token: {token}")
         return {'success': True, 'token': token}, 200
 
 

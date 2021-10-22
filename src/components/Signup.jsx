@@ -34,17 +34,22 @@ class Signup extends React.Component {
     // document.getElementById("emailInput").value = ""
     // document.getElementById("passwordInput").value = ""
 
-    let userdata = {
-      eHash: this.props.server.generateHash(this.state.email, ""),
-      iHash: this.props.server.generateHash(this.state.email, this.state.password)
-    }
+    let eHash = this.props.server.generateHash(this.state.email, "");
+    let idHash = this.props.server.generateHash(this.state.email, this.state.password);
+    let User = {
+        firstName: this.state.firstName,
+        lastName: this.state.lastName,
+        email: this.state.email,
+        userID: idHash,
+        totalGPA: 0,
+      }
 
     if (this.state.email === "" || this.state.password === "" || this.state.firstName === "" || this.state.lastName === "") {
       event.preventDefault();
       return
     }
 
-    this.props.server.register(userdata).then((data) => {
+    this.props.server.register(eHash, idHash, User).then((data) => {
       if (!data.success) {
         document.getElementById("emailInput").classList.add("is-invalid")
       } else {
@@ -52,14 +57,6 @@ class Signup extends React.Component {
         this.props.server.myHeaders = {
           'Content-Type': 'application/json',
           'Authorization': ('Bearer ' + data.token)
-        }
-
-        let User = {
-          firstName: this.state.firstName,
-          lastName: this.state.lastName,
-          email: this.state.email,
-          userID: userdata.iHash,
-          totalGPA: 0,
         }
 
         this.props.server.addUserData('users', User).then((dataBack) => {

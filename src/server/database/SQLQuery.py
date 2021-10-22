@@ -48,7 +48,7 @@ class SQLQuery(DbQuery):
         try:
             self.conn.execute(command)
         except sqlite3.IntegrityError as e:
-            # print(e)
+            print(e)
             self.conn.close()
             return False
 
@@ -67,7 +67,8 @@ class SQLQuery(DbQuery):
 
         try:
             self.conn.execute(command)
-        except sqlite3.IntegrityError:
+        except sqlite3.IntegrityError as e:
+            print(e)
             self.conn.close()
             return False
         self.conn.commit()
@@ -78,7 +79,8 @@ class SQLQuery(DbQuery):
         self.conn = self.dbConnect.connect(self.path)
         try:
             self.out = self.conn.execute(f"delete from {table} where {id_name}='{id}'")
-        except sqlite3.IntegrityError:
+        except sqlite3.IntegrityError as e:
+            print(e)
             self.conn.close()
             return False
         out = True

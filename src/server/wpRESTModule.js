@@ -102,25 +102,29 @@ class RESTModule {
 		const res = await fetch(this.serverLocation + this.apiVersion + 'auth/login', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: '{"eHash":"' + eHash + '","iHash": "' + idHash + '"}',
+			body: '{"eHash":"' + eHash + '","idHash": "' + idHash + '"}',
 		})
 		const data = await res.json()
 		return data
 		//authenticate().then(function(object){t = object.access_token})
 	}
 
-	register = async (userdata) => {
+	register = async (eHash, idHash, userdata) => {
+        let outData = {
+            'eHash': eHash,
+            'idHash': idHash,
+            'user': userdata
+        }
 		const res = await fetch(this.serverLocation + this.apiVersion + 'auth/register', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(userdata),
+			body: JSON.stringify(outData),
 		})
 		const data = await res.json()
 		return data
 	}
 
 	generateHash(email, password) {
-        console.log(crypto.createHash('sha256').update(email + password).digest('hex'))
 		return crypto.createHash('sha256').update(email + password).digest('hex')
 		// return parseInt( crypto.createHash('sha256').update(email + password).digest('hex').split('').reverse().join(''), 16);
 	}

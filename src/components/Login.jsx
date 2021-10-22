@@ -26,7 +26,6 @@ class Login extends React.Component {
     var iHash = this.props.server.generateHash(this.state.email, this.state.password)
 
     this.props.server.authenticate(eHash, iHash).then((dataA) => {
-      console.log(dataA)
       if (!dataA.success) {
         document.getElementById("passwordInput").classList.add("is-invalid")
         document.getElementById("emailInput").classList.add("is-invalid")
