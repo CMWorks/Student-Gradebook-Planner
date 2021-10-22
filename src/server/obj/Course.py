@@ -3,21 +3,32 @@ from database.dbQuery import DbQuery
 
 class Course:
     def __init__(self, db: DbQuery, dictData: dict = None):
+        self.db = db
         if dictData is None:
-            self.db = db
             self.courseID = -1
             self.courseName = ''
-            self.creditHourse = 0
+            self.creditHours = 0
             self.courseType = None
+            self.userID = ''
         else:
-            self.db = db
             self.courseID = dictData['courseID']
             self.courseName = dictData['courseName']
-            self.creditHourse = dictData['creditHourse']
+            self.creditHours = dictData['creditHours']
             self.courseType = None
+            self.userID = dictData['userID']
 
     @staticmethod
     def getCourses(db: DbQuery, id):
+        raise NotImplementedError
+
+    @staticmethod
+    def deleteCourses(db: DbQuery, idName, id):
+        raise NotImplementedError
+
+    def addCourse(self):
+        raise NotImplementedError
+
+    def updateCourse(self):
         raise NotImplementedError
 
     def getCourseID(self):
@@ -26,8 +37,11 @@ class Course:
     def getCourseName(self):
         return self.courseName
 
-    def getCredditHours(self):
-        return self.creditHourse
+    def getCreditHours(self):
+        return self.creditHours
+
+    def getUserID(self):
+        return self.userID
 
     def setCourseID(self, id):
         self.courseID = id
@@ -35,5 +49,8 @@ class Course:
     def setCourseName(self, name):
         self.courseName = name
 
-    def setCredditHours(self, hours):
-        self.creditHourse = hours
+    def setCreditHours(self, hours):
+        self.creditHours = hours
+
+    def setUserID(self, id):
+        self.userID = id

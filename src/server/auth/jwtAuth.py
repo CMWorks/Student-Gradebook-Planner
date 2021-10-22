@@ -13,7 +13,7 @@ class JWTAuth(Authentication):
 
     def register(self, email: str, userID: str):
         token = self._createAuthToken(email, userID)
-        success = self.db.add('Credentials', [userID, email])
+        success = self.db.add('Credentials', {'userID':userID, 'email':email})
         if success:
             return token
         else:

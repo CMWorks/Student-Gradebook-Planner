@@ -4,7 +4,7 @@ from database.dbQuery import DbQuery
 
 class FutureCourse(Course):
 
-    _tabel_name = 'FutureCourse'
+    _tabel_name = 'FUTURE_COURSE'
 
     def __init__(self, db: DbQuery, dictData: dict = None):
         super().__init__(db, dictData)
@@ -23,11 +23,13 @@ class FutureCourse(Course):
             name = data[1]
             hours = data[2]
             plan = data[3]
+            uid = data[4]
             new_course = FutureCourse(db)
             new_course.setCourseID(id)
             new_course.setCourseName(name)
-            new_course.setCredditHours(hours)
+            new_course.setCreditHours(hours)
             new_course.setPlannedSemester(plan)
+            new_course.setUserID(uid)
             out.append(new_course)
 
         return out
@@ -37,12 +39,12 @@ class FutureCourse(Course):
         return db.delete(FutureCourse._tabel_name, idName, id)
 
     def addCourse(self):
-        listData = [self.getCourseID(), self.getCourseName(), self.getCredditHours(), self.getPlannedSemester()]
-        return self.db.add(FutureCourse._tabel_name, listData)
+        dictData = self.toJson()
+        return self.db.add(FutureCourse._tabel_name, dictData)
 
     def updateCourse(self):
         dictData = self.toJson()
-        return self.db.update(FutureCourse._tabel_name, dictData)
+        return self.db.update(FutureCourse._tabel_name, dictData, 'courseID', self.getCourseID())
 
     def getPlannedSemester(self):
         return self.plannedSemester
@@ -53,7 +55,8 @@ class FutureCourse(Course):
     def toJson(self):
         data = {'courseID':self.getCourseID(),
                 'courseName': self.getCourseName(),
-                'creditHours': self.getCredditHours(),
-                'plannedSemester': self.getPlannedSemester()
+                'creditHours': self.getCreditHours(),
+                'plannedSemester': self.getPlannedSemester(),
+                'userID': self.getUserID()
                 }
         return data

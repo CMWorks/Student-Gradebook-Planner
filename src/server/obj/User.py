@@ -4,7 +4,7 @@ from obj.Semester import Semester
 
 
 class User:
-    _tabel_name = 'User'
+    _tabel_name = 'STUDENT'
 
     def __init__(self, db: DbQuery, dictData: dict = None):
         if dictData is None:
@@ -48,12 +48,12 @@ class User:
         return db.delete(User._tabel_name, 'userID', id)
 
     def addUser(self):
-        listData = [self.getUserID(), self.getFirstName(), self.getLastName(), self.getEmail(), self.getTotalGPA()]
-        return self.db.add(User._tabel_name, listData)
-
-    def updateUser(self):
         dictData = self.toJson()
-        return self.db.update(User._tabel_name, dictData)
+        return self.db.add(User._tabel_name, dictData)
+
+    def updateUser(self) -> bool:
+        dictData = self.toJson()
+        return self.db.update(User._tabel_name, dictData, 'userID', self.getUserID())
 
     def getUserID(self):
         return self.userID

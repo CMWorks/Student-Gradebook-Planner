@@ -120,6 +120,7 @@ class RESTModule {
 	}
 
 	generateHash(email, password) {
+        console.log(crypto.createHash('sha256').update(email + password).digest('hex'))
 		return crypto.createHash('sha256').update(email + password).digest('hex')
 		// return parseInt( crypto.createHash('sha256').update(email + password).digest('hex').split('').reverse().join(''), 16);
 	}

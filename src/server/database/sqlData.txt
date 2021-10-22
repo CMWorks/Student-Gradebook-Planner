@@ -1,1 +1,1 @@
-location=database/db.sqlite3
+location=database/gradebook.sqlite3

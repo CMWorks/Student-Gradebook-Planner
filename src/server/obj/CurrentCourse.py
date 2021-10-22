@@ -5,16 +5,18 @@ from obj.Category import Category
 
 class CurrentCourse(Course):
 
-    _tabel_name = "CurrentCourse"
+    _tabel_name = "CURRENT_COURSE"
 
     def __init__(self, db: DbQuery, dictData: dict = None):
         super().__init__(db, dictData)
         if dictData is None:
             self.isOnline = False
             self.grade = 0.0
+            self.semesterID = 0
         else:
             self.isOnline = dictData['isOnline']
             self.grade = dictData['grade']
+            self.semesterID = dictData['semesterID']
 
     @staticmethod
     def getCourses(db: DbQuery, idName, id):
@@ -27,12 +29,16 @@ class CurrentCourse(Course):
             hours = data[2]
             online = data[3]
             grade = data[4]
+            sid = data[5]
+            uid = data[6]
             new_course = CurrentCourse(db)
             new_course.setCourseID(id)
             new_course.setCourseName(name)
-            new_course.setCredditHours(hours)
+            new_course.setCreditHours(hours)
             new_course.setIsOnline(online)
             new_course.setGrade(grade)
+            new_course.setSemesterID(sid)
+            new_course.setUserID(uid)
             out.append(new_course)
 
         return out
@@ -42,18 +48,21 @@ class CurrentCourse(Course):
         return db.delete(CurrentCourse._tabel_name, idName, id)
 
     def addCourse(self):
-        listData = [self.getCourseID(), self.getCourseName(), self.getCredditHours(), self.getIsOnline(), self.getGrade()]
-        return self.db.add(CurrentCourse._tabel_name, listData)
+        dictData = self.toJson()
+        return self.db.add(CurrentCourse._tabel_name, dictData)
 
     def updateCourse(self):
         dictData = self.toJson()
-        return self.db.update(CurrentCourse._tabel_name, dictData)
+        return self.db.update(CurrentCourse._tabel_name, dictData, 'courseID', self.getCourseID())
 
     def getIsOnline(self):
         return self.isOnline
 
     def getGrade(self):
         return self.grade
+
+    def getSemesterID(self):
+        return self.semesterID
 
     def getGPAGrade(self):
         if self.grade >= 90:
@@ -73,12 +82,17 @@ class CurrentCourse(Course):
     def setIsOnline(self, online):
         self.isOnline = online
 
+    def setSemesterID(self, id):
+        self.semesterID = id
+
     def toJson(self):
         data = {'courseID':self.getCourseID(),
                 'courseName': self.getCourseName(),
-                'creditHours': self.getCredditHours(),
+                'creditHours': self.getCreditHours(),
                 'isOnline': self.getIsOnline(),
-                'grade': self.getGrade()
+                'grade': self.getGrade(),
+                'semesterID': self.getSemesterID(),
+                'userID': self.getUserID()
                 }
         return data
 

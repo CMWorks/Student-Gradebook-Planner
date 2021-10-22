@@ -31,32 +31,39 @@ class SQLQuery(DbQuery):
             f"select * from {table} where {id_name}='{id}'")
         return self.__data_to_dict(data)
 
-    def add(self, table, listData: list):
+    def add(self, table, dicData: dict):
         self.conn = self.dbConnect.connect(self.path)
-        command = f"insert into {table} values("
-        for value in listData:
-            command += f"'{value}',"
+        id_str = '('
+        value_str = '('
+        for key, value in dicData.items():
+            id_str += f"{key},"
+            value_str += f"'{value}',"
 
         # remove the last comma and add ending )
-        command = command[:-1] + ")"
+        id_str = id_str[:-1] + ")"
+        value_str = value_str[:-1] + ")"
+
+        command = f"insert into {table} {id_str} values {value_str};"
 
         try:
             self.conn.execute(command)
-        except sqlite3.IntegrityError:
+        except sqlite3.IntegrityError as e:
+            # print(e)
             self.conn.close()
             return False
+
         self.conn.commit()
         self.conn.close()
         return True
 
-    def update(self, table, dicData: dict):
+    def update(self, table, dicData: dict, id_name, id):
         self.conn = self.dbConnect.connect(self.path)
         command = f"update {table} set "
         for key, value in dicData.items():
             command += f"{key} = '{value}',"
 
         # remove the last comma and add ending )
-        command = command[:-1]
+        command = command[:-1] + f" where {id_name} = '{id}'"
 
         try:
             self.conn.execute(command)
@@ -70,10 +77,13 @@ class SQLQuery(DbQuery):
     def delete(self, table, id_name, id):
         self.conn = self.dbConnect.connect(self.path)
         try:
-            self.conn.execute(f"delete from {table} where {id_name}='{id}'")
+            self.out = self.conn.execute(f"delete from {table} where {id_name}='{id}'")
         except sqlite3.IntegrityError:
             self.conn.close()
             return False
+        out = True
+        if self.conn.total_changes == 0:
+            out = False
         self.conn.commit()
         self.conn.close()
-        return True
+        return out
