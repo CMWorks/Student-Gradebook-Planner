@@ -36,7 +36,7 @@ class Login extends React.Component {
           'authorization': ('Bearer ' + dataA.token)
         }
         this.props.server.getUserData('users',iHash).then((data) => {
-          this.props.set({ mode: "Entered", user: data[0] })
+          this.props.set({ mode: "Entered", user: data.data })
         })
       }
     })
