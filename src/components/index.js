@@ -7,3 +7,4 @@ export { default as Semesters } from "./Semesters";
 export { default as Login } from "./Login";
 export { default as Signup } from "./Signup";
 export { default as FinalGradeCalculator } from "./FinalGradeCalculator";
+export { default as Course } from "./Course";
