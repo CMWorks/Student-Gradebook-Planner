@@ -1,7 +1,9 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { Navigation, Footer, Home, About, Contact, Login, Signup, Semesters, FinalGradeCalculator } from "./components";
+import { Navigation, Footer, Home, About, Contact, Course, Login, Signup, Semesters, FinalGradeCalculator } from "./components";
 import RESTModule from "./server/wpRESTModule";
+import AssignmentCategory from "./components/AssignmentCategory";
+import Assignment from "./components/Assignment";
 
 class App extends React.Component {
 
@@ -11,7 +13,7 @@ class App extends React.Component {
     this.server.obj = "App"
     this.baseLocation = "http://localhost:3000/"
     this.state = {
-      mode: "Login",
+      mode: "Entered",
       user: {}
     }
   }
@@ -58,6 +60,7 @@ class App extends React.Component {
               <Route path="/contact" exact component={() => <Contact userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
               <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
               <Route path="/final-grade-calculator" exact component={() => <FinalGradeCalculator />} />
+              <Route path="/course" exact component={() => <Course userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
             </Switch>
             <Footer />
           </Router>
