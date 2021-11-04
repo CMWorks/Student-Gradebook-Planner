@@ -11,7 +11,7 @@ class SQLQuery(DbQuery):
         out = []
         for row in data:
             out.append(row)
-        self.conn.close()
+        
         return out
 
     @staticmethod

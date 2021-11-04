@@ -20,6 +20,7 @@ class SQLConnection(DbConnection):
 
         # Ensures that the cascade constraint is enforced
         self.conn.execute("PRAGMA foreign_keys = 1")
+        # self.conn.execute("PRAGMA JOURNAL_MODE = 'WAL'")
         return self.conn
 
     def close(self):
