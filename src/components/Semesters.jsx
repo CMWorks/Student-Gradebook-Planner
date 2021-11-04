@@ -1,39 +1,145 @@
 import React from "react";
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-class Semesters extends React.Component {
+// Each elemetn of the second list
+function CourseBox(props) {
+    return (
+        <div>
+            <Link type="button" className="btn btn-outline-primary" to="/contact">
+                {props.data.courseName}
+                {" - creditHours: "}
+                {props.data.creditHours}
+                {" - isOnline: "}
+                {props.data.isOnline ? "true" : "false"}
+                {" - grade: "}
+                {props.data.grade}
+            </Link>
+        </div>
+    );
+}
+
+// Each element of the main list
+class SemesterBox extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            semester: this.props.data,
+            courses: [],
+            hide: true
+        }
+
+        this.handleClick = this.handleClick.bind(this);
+
+        this.getCor(this.state.semester.semesterID);
+    }
+
+    getCor(semesterID) {
+        this.props.server.getAllFromTable('currentCourses', 'semesterID', semesterID).then(retrieve => {
+            // retrieve is {success: bool, data: array of objects}
+            let data = retrieve.data;
+            this.setState({ courses: data });
+        })
+    }
+
+    handleClick() {
+        let chide = !this.state.hide;
+        this.setState({ hide: chide });
+    }
 
     render() {
-      return (
-        <div className="semesters">
-          <div className="container">
-            <div className="row align-items-center my-5">
-              <div className="col-lg-7">
-                <img
-                  className="img-fluid rounded mb-4 mb-lg-0"
-                  src="http://placehold.it/900x400"
-                  alt=""
-                />
-              </div>
-              <div className="col-lg-5">
-                <h1 className="font-weight-light">Semesters</h1>
-                <li className={'nav-item'}>
-                  <Link to="/course">
-                    Course
-                  </Link>
+        const data = this.state.courses;
+        const listCourses = data.map(function (d, idx) {
+            return (
+                <li key={d.courseID}>
+                    <CourseBox
+                        data={d}
+                    />
                 </li>
-                <p>
-                  Lorem Ipsum is simply dummy text of the printing and typesetting
-                  industry. Lorem Ipsum has been the industry's standard dummy text
-                  ever since the 1500s, when an unknown printer took a galley of
-                  type and scrambled it to make a type specimen book.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      );
+            )
+        })
+        if (this.state.hide) {
+            return (
+                <div>
+                    <button type="button" className="btn btn-dark" onClick={this.handleClick}>
+                        {this.props.data.semesterName}
+                        {" - gpa: "}
+                        {this.props.data.gpa}
+                    </button>
+                </div>
+
+
+            );
+        } else {
+            return (
+                <div>
+                    <button type="button" className="btn btn-info" onClick={this.handleClick}>
+                        {this.props.data.semesterName}
+                        {" - gpa: "}
+                        {this.props.data.gpa}
+                    </button>
+                    <ul>
+                        {listCourses}
+                    </ul>
+                </div>
+
+
+            );
+        }
     }
-  }
-  
-  export default Semesters;
+}
+
+// Main semester list
+class Semesters extends React.Component {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            semesters: []
+        }
+        this.getSem();
+    }
+
+    getSem() {
+        let id = this.props.userData.userID;
+        this.props.server.getAllFromTable('semesters', 'userID', id).then(retrieve => {
+            // retrieve is {success: bool, data: array of objects}
+            let data = retrieve.data;
+
+            this.setState({ semesters: data });
+        })
+    }
+
+    renderBox(semestJSON) {
+        return (
+            <SemesterBox
+                data={semestJSON}
+                onClick={() => { console.log(semestJSON.semesterName); }}
+            />
+        );
+    }
+
+    render() {
+        const data = this.state.semesters;
+        const server = this.props.server;
+        const listSemester = data.map(function (d, idx) {
+            return (
+                <li key={idx}>
+                    <SemesterBox
+                        data={d}
+                        server={server}
+                    />
+                </li>)
+        })
+
+        return (
+            <div className="semesters">
+                <div className="container">
+                    <h1 className="font-weight-light">Semesters</h1>
+                    {listSemester}
+                </div>
+            </div>
+        );
+    }
+}
+
+export default Semesters;
