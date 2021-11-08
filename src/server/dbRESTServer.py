@@ -10,6 +10,7 @@ from obj.CurrentCourse import CurrentCourse
 from obj.FutureCourse import FutureCourse
 from obj.Category import Category
 from obj.Assignment import Assignment
+from obj.UserDbHandler import UserDbHandler
 
 api = Flask(__name__)
 
@@ -22,7 +23,7 @@ auth = JWTAuth(db)
 
 
 @api.after_request
-def add_cors_headers(response:Response):
+def add_cors_headers(response: Response):
     if request.referrer is None:
         return response
     r = request.referrer[:-1]
@@ -31,6 +32,8 @@ def add_cors_headers(response:Response):
         response.headers.add('Access-Control-Allow-Credentials', 'true')
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
         response.headers.add('Access-Control-Allow-Headers', 'Cache-Control')
+        response.headers.add('X-UA-Compatible', 'IE=Edge,chrome=1')
+        response.headers.add('Cache-Control', 'public, max-age=0')
         response.headers.add(
             'Access-Control-Allow-Headers', 'X-Requested-With')
         response.headers.add('Access-Control-Allow-Headers', 'Authorization')
@@ -50,9 +53,13 @@ def check_authorization():
 
 @api.route('/v1/auth/register', methods=['POST'])
 def register_user():
-    data = json.loads(request.data.decode('UTF-8'))
-    user = User(db, data['user'])
-    token = user.addUser()
+    try:
+        data = json.loads(request.data.decode('UTF-8'))
+        user = User(data['user'])
+    except Exception:
+        return {'success': False, 'message': 'Incorrect Data'}, 404
+
+    token = UserDbHandler.add(db, user)
     if token is False:
         print("Registeration Info Already Being Used")
         return {'success': False}, 401
@@ -82,7 +89,7 @@ def get_user(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    user = User.getUser(db, id)
+    user: User = UserDbHandler.get(db, 'userID', id)
     if user is None:
         print("No user found")
         return {'success': False, 'message': 'Not Found'}, 404
@@ -96,9 +103,13 @@ def add_user():
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    data = json.loads(request.data.decode('UTF-8'))
-    user = User(db, data)
-    success = user.addUser()
+    try:
+        data = json.loads(request.data.decode('UTF-8'))
+        user = User(data)
+    except Exception:
+        return {'success': False, 'message': 'Incorrect Data'}, 404
+
+    success = UserDbHandler.add(db, user)
     if not success:
         print("unsuccessful to add user")
         return {'success': False, 'message': 'Not Found'}, 404
@@ -112,9 +123,14 @@ def update_user():
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    data = json.loads(request.data.decode('UTF-8'))
-    user = User(db, data)
-    success = user.updateUser()
+
+    try:
+        data = json.loads(request.data.decode('UTF-8'))
+        user = User(data)
+    except Exception:
+        return {'success': False, 'message': 'Incorrect Data'}, 404
+
+    success = UserDbHandler.update(db, user)
     if not success:
         print("unsuccessful to update user")
         return {'success': False, 'message': 'Not Found'}, 404
@@ -129,7 +145,7 @@ def delete_user(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
 
-    success = User.deleteUser(db, id)
+    success = UserDbHandler.delete(db, 'userID', id)
     if not success:
         print("unsuccessful to delete user")
         return {'success': False, 'message': 'Not Found'}, 404
@@ -152,7 +168,10 @@ def get_all_semester():
     data = []
     for sem in semesters:
         data.append(sem.toJson())
-    return {'success': True, 'data': data}, 200
+    if len(data) == 0:
+        return {'success': False, 'data': data}, 404
+    else:
+        return {'success': True, 'data': data}, 200
 
 
 @api.route('/v1/semesters/<id>', methods=['GET'])
@@ -165,8 +184,6 @@ def get_semester(id):
         return {'success': False, 'message': 'Not Found'}, 404
 
     return {'success': True, 'data': semester[0].toJson()}, 200
-
-
 
 
 @api.route('/v1/semesters', methods=['POST'])

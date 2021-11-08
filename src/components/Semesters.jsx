@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, withRouter } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 class Semesters extends React.Component {
     constructor(props)
@@ -86,10 +86,8 @@ class Semesters extends React.Component {
                 
               </div>
             </div>
-          </div>
-        </div>
-      );
+        );
     }
-  }
-  
-  export default Semesters;
+}
+
+export default Semesters;

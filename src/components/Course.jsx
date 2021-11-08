@@ -67,7 +67,6 @@ class Course extends React.Component
         }
         return array;
       }
-    
 
     render() {
         // this.getting();
