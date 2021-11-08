@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 function CourseBox(props) {
     return (
         <div>
-            <Link type="button" className="btn btn-outline-primary" to="/contact">
+            <Link type="button" className="btn btn-outline-primary" to="/course" onClick={()=>{props.set({selectedCourseID: props.data.courseID})}}>
                 {props.data.courseName}
                 {" - creditHours: "}
                 {props.data.creditHours}
@@ -48,11 +48,13 @@ class SemesterBox extends React.Component {
 
     render() {
         const data = this.state.courses;
+        const set = this.props.set;
         const listCourses = data.map(function (d, idx) {
             return (
                 <li key={d.courseID}>
                     <CourseBox
                         data={d}
+                        set={set}
                     />
                 </li>
             )
@@ -109,24 +111,17 @@ class Semesters extends React.Component {
         })
     }
 
-    renderBox(semestJSON) {
-        return (
-            <SemesterBox
-                data={semestJSON}
-                onClick={() => { console.log(semestJSON.semesterName); }}
-            />
-        );
-    }
-
     render() {
         const data = this.state.semesters;
         const server = this.props.server;
+        const set = this.props.set;
         const listSemester = data.map(function (d, idx) {
             return (
                 <li key={idx}>
                     <SemesterBox
                         data={d}
                         server={server}
+                        set={set}
                     />
                 </li>)
         })

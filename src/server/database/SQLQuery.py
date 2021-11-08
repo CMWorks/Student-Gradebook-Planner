@@ -24,11 +24,17 @@ class SQLQuery(DbQuery):
         self.dbConnect = SQLConnection(path)
         self.isOpen = True
 
+
+    # Awful way to fix cross threads, but it works.
     def get(self, table, id_name, id):
-        self.conn = self.dbConnect.connect()
-        data = self.conn.execute(
-            f"select * from {table} where {id_name}='{id}'")
-        return self.__data_to_dict(data)
+        while True:
+            try:
+                self.conn = self.dbConnect.connect()
+                data = self.conn.execute(
+                    f"select * from {table} where {id_name}='{id}'")
+                return self.__data_to_dict(data)
+            except Exception:
+                print("Error - retrying select command")
 
     def add(self, table, dicData: dict):
         self.conn = self.dbConnect.connect()
@@ -51,9 +57,12 @@ class SQLQuery(DbQuery):
             self.conn.close()
             return False
 
+        out = True
+        if self.conn.total_changes == 0:
+            out = False
         self.conn.commit()
         self.conn.close()
-        return True
+        return out
 
     def update(self, table, dicData: dict, id_name, id):
         self.conn = self.dbConnect.connect()
@@ -70,9 +79,12 @@ class SQLQuery(DbQuery):
             print(e)
             self.conn.close()
             return False
+        out = True
+        if self.conn.total_changes == 0:
+            out = False
         self.conn.commit()
         self.conn.close()
-        return True
+        return out
 
     def delete(self, table, id_name, id):
         self.conn = self.dbConnect.connect()
