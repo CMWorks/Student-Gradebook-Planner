@@ -2,6 +2,13 @@ import React, { Component } from 'react'
 import Assignment from './Assignment';
 
 class AssignmentCategory extends Component {
+    constructor(props)
+    {
+        super(props);
+    }
+
+
+
     render() {
         const { category } = this.props;
 
