@@ -13,8 +13,10 @@ class App extends React.Component {
     this.server.obj = "App"
     this.baseLocation = "http://localhost:3000/"
     this.state = {
-      mode: "Entered",
-      user: {}
+      mode: "Login",
+      user: {},
+      courseID: -1,
+      courseName: '',
     }
   }
 
@@ -60,7 +62,7 @@ class App extends React.Component {
               <Route path="/contact" exact component={() => <Contact userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
               <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
               <Route path="/final-grade-calculator" exact component={() => <FinalGradeCalculator />} />
-              <Route path="/course" exact component={() => <Course userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
+              <Route path="/course" exact component={() => <Course userData={this.state.user} courseID={this.state.courseID} courseName={this.state.courseName} server={this.server} set={(obj) => this.setState(obj) } />} />
             </Switch>
             <Footer />
           </Router>
