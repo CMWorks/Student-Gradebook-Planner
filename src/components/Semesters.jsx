@@ -1,137 +1,90 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-// Each elemetn of the second list
-function CourseBox(props) {
-    return (
-        <div>
-            <Link type="button" className="btn btn-outline-primary" to="/course" onClick={()=>{props.set({selectedCourseID: props.data.courseID})}}>
-                {props.data.courseName}
-                {" - creditHours: "}
-                {props.data.creditHours}
-                {" - isOnline: "}
-                {props.data.isOnline ? "true" : "false"}
-                {" - grade: "}
-                {props.data.grade}
-            </Link>
-        </div>
-    );
-}
-
-// Each element of the main list
-class SemesterBox extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            semester: this.props.data,
-            courses: [],
-            hide: true
-        }
-
-        this.handleClick = this.handleClick.bind(this);
-
-        this.getCor(this.state.semester.semesterID);
-    }
-
-    getCor(semesterID) {
-        this.props.server.getAllFromTable('currentCourses', 'semesterID', semesterID).then(retrieve => {
-            // retrieve is {success: bool, data: array of objects}
-            let data = retrieve.data;
-            this.setState({ courses: data });
-        })
-    }
-
-    handleClick() {
-        let chide = !this.state.hide;
-        this.setState({ hide: chide });
-    }
-
-    render() {
-        const data = this.state.courses;
-        const set = this.props.set;
-        const listCourses = data.map(function (d, idx) {
-            return (
-                <li key={d.courseID}>
-                    <CourseBox
-                        data={d}
-                        set={set}
-                    />
-                </li>
-            )
-        })
-        if (this.state.hide) {
-            return (
-                <div>
-                    <button type="button" className="btn btn-dark" onClick={this.handleClick}>
-                        {this.props.data.semesterName}
-                        {" - gpa: "}
-                        {this.props.data.gpa}
-                    </button>
-                </div>
-
-
-            );
-        } else {
-            return (
-                <div>
-                    <button type="button" className="btn btn-info" onClick={this.handleClick}>
-                        {this.props.data.semesterName}
-                        {" - gpa: "}
-                        {this.props.data.gpa}
-                    </button>
-                    <ul>
-                        {listCourses}
-                    </ul>
-                </div>
-
-
-            );
-        }
-    }
-}
-
-// Main semester list
 class Semesters extends React.Component {
+    constructor(props)
+    {
+      super(props);
+      this.state = {
+        semesters: [],
+        courses: []
+      }
+    }
 
-    constructor(props) {
-        super(props)
-        this.state = {
-            semesters: []
+
+    
+    componentDidMount = async () =>
+    {
+      let id = this.props.userData.userID;
+          this.props.server.getAllFromTable('semesters', 'userID', id).then(retrieve => {
+              let success = retrieve.success;
+              let data = retrieve.data;
+  
+              console.log('success: ' + success);
+              this.setState({semesters: retrieve.data});
+              this.getCourseInfo();
+          });
+    }
+
+    getCourseInfo = async () =>
+    {
+      for(let i = 0; i < this.state.semesters.length; i++)
+      {
+        const response = await this.props.server.getAllFromTable('currentCourses', 'semesterID', this.state.semesters[i].semesterID).then(retrieve => {
+              let success = retrieve.success;
+              let data = retrieve.data;
+
+              console.log('success: ' + success);
+              return data;
+            })
+            this.setState({courses: this.state.courses.concat(response)});
+      }
+    }
+
+    displayCourses(semesterID) {
+      let array = [];
+      for(let m = 0; m < this.state.courses.length; m++)
+      {
+        // console.log(semesterID);
+        // console.log(this.state.courses[m].semesterID);
+        if(semesterID == this.state.courses[m].semesterID)
+        {
+            array.push(
+              <ul>
+                <Link  onClick={(event) => { this.props.set({ courseID: this.state.courses[m].courseID, courseName: this.state.courses[m].courseName }) }}
+                  to = {{
+                    pathname: "/course",
+                  }}>{this.state.courses[m].courseName}</Link>
+              </ul>
+            );
         }
-        this.getSem();
+      }
+      return array;
     }
-
-    getSem() {
-        let id = this.props.userData.userID;
-        this.props.server.getAllFromTable('semesters', 'userID', id).then(retrieve => {
-            // retrieve is {success: bool, data: array of objects}
-            let data = retrieve.data;
-
-            this.setState({ semesters: data });
-        })
-    }
+    
+  
 
     render() {
-        const data = this.state.semesters;
-        const server = this.props.server;
-        const set = this.props.set;
-        const listSemester = data.map(function (d, idx) {
-            return (
-                <li key={idx}>
-                    <SemesterBox
-                        data={d}
-                        server={server}
-                        set={set}
-                    />
-                </li>)
-        })
-
-        return (
-            <div className="semesters">
-                <div className="container">
-                    <h1 className="font-weight-light">Semesters</h1>
-                    {listSemester}
-                </div>
+      // console.log(this.state.semesters);
+      // console.log(this.state.courses);
+      return (
+        <div className="semesters">
+          <div className="container">
+            <div className="row align-items-center my-5">
+              <div className="col-lg-5">
+                <h1 className="font-weight-light">Semesters</h1>
+                <ul>
+                  {this.state.semesters.map((semester) =>  (
+                    <div>
+                      <h4 key={semester.semesterID}>{semester.semesterName}</h4>
+                      <ul className={'nav-item'} >
+                      {this.displayCourses(semester.semesterID)}
+                      </ul>
+                    </div>
+                  ))}
+                </ul>
+                
+              </div>
             </div>
         );
     }

@@ -15,7 +15,8 @@ class App extends React.Component {
     this.state = {
       mode: "Login",
       user: {},
-      selectedCourseID: 0
+      courseID: -1,
+      courseName: '',
     }
   }
 
@@ -31,7 +32,7 @@ class App extends React.Component {
               <Route path="/contact" exact component={() => <Contact userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
               <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
               <Route path="/final-grade-calculator" exact component={() => <FinalGradeCalculator />} />
-              <Route path="/course" exact component={() => <Course userData={this.state.user} selectedCourseID={this.state.selectedCourseID} server={this.server} set={(obj) => this.setState(obj)} />} />
+              <Route path="/course" exact component={() => <Course userData={this.state.user} courseID={this.state.courseID} courseName={this.state.courseName} server={this.server} set={(obj) => this.setState(obj) } />} />
             </Switch>
             <Footer />
           </Router>
