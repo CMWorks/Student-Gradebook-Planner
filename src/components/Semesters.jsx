@@ -86,6 +86,8 @@ class Semesters extends React.Component {
                 
               </div>
             </div>
+            </div>
+            </div>
         );
     }
 }
