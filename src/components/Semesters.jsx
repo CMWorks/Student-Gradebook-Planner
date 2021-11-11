@@ -51,7 +51,7 @@ class Semesters extends React.Component {
         {
             array.push(
               <ul>
-                <Link  onClick={(event) => { this.props.set({ courseID: this.state.courses[m].courseID, courseName: this.state.courses[m].courseName }) }}
+                <Link  onClick={(event) => { this.props.set({ courseID: this.state.courses[m].courseID, courseName: this.state.courses[m].courseName, semesterID: this.state.courses[m].semesterID  }) }}
                   to = {{
                     pathname: "/course",
                   }}>{this.state.courses[m].courseName}</Link>

@@ -15,6 +15,7 @@ class Course extends React.Component
         this.state = {
             courseName: this.props.courseName,
             courseID: this.props.courseID,
+            semesterID: this.props.semesterID,
             assignmentCategories: [],
             assignments: [],
             popUpButton: false,
@@ -91,9 +92,25 @@ class Course extends React.Component
       }
 
 
+    //This is to add the category
       handleSubmitAddCategory(event) {
-          //let category = 
-      }
+          //Create the category object to send
+        let Category = {
+            categoryID: Math.floor(Math.random() * (2000-100) + 100), //How should I calculate this?
+            categoryName: this.state.categoryName,
+            weight: this.state.categoryWeight,
+            catageoryGrade: 0, //I dont know how I am supposed to calculate this with the function in the python file
+            courseID: this.state.courseID,
+            semesterID: this.state.semesterID,
+            userID: this.props.userID
+          }
+          if (this.state.categoryName === "" || this.state.categoryWeight === "") {
+            event.preventDefault();
+            return
+          }
+          this.props.server.addUserData('categories', Category); //This is not working, getting internal server error
+          event.preventDefault();
+
     
       handleChangeCategoryName(event) {
         this.setState({ categoryName: event.target.value });
