@@ -91,6 +91,7 @@ class Course extends React.Component
         return array;
       }
 
+
     //This is to add the category
       handleSubmitAddCategory(event) {
           //Create the category object to send
@@ -109,7 +110,7 @@ class Course extends React.Component
           }
           this.props.server.addUserData('categories', Category); //This is not working, getting internal server error
           event.preventDefault();
-      }
+
     
       handleChangeCategoryName(event) {
         this.setState({ categoryName: event.target.value });
@@ -118,6 +119,7 @@ class Course extends React.Component
       handleChangeCategoryWeight(event) {
         this.setState({ categoryWeight: event.target.value });
       }
+
 
     render() {
         
