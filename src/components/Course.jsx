@@ -90,8 +90,9 @@ class Course extends React.Component
         return array;
       }
 
+
       handleSubmitAddCategory(event) {
-          let category = 
+          //let category = 
       }
     
       handleChangeCategoryName(event) {
@@ -101,6 +102,7 @@ class Course extends React.Component
       handleChangeCategoryWeight(event) {
         this.setState({ categoryWeight: event.target.value });
       }
+
 
     render() {
         

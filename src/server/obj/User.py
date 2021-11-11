@@ -1,59 +1,23 @@
-from typing import overload
-from database.dbQuery import DbQuery
 from obj.Semester import Semester
 
 
 class User:
-    _tabel_name = 'STUDENT'
+    def __checkType(self):
+        if type(self.userID) != str or type(self.firstName) != str or type(self.lastName) != str or type(self.email) != str or (type(self.totalGPA) != float and type(self.totalGPA) != int):
+            raise TypeError
 
-    def __init__(self, db: DbQuery, dictData: dict = None):
-        if dictData is None:
-            self.db = db
-            self.userID = ''
-            self.firstName = ''
-            self.lastName = ''
-            self.email = ''
-            self.totalGPA = 0.0
-        else:
-            self.db = db
-            self.userID = dictData['userID']
-            self.firstName = dictData['firstName']
-            self.lastName = dictData['lastName']
-            self.email = dictData['email']
-            self.totalGPA = dictData['totalGPA']
+    def __chechValue(self):
+        if self.totalGPA < 0:
+            raise ValueError
 
-    @staticmethod
-    def getUser(db: DbQuery, id):
-        userData = db.get(User._tabel_name, 'userID', id)
-        if len(userData) != 1:
-            return None
-        
-        userData = userData[0]
-        id = userData[0]
-        first = userData[1]
-        last = userData[2]
-        email = userData[3]
-        gpa = userData[4]
-        new_user = User(db)
-        new_user.setUserID(id)
-        new_user.setFirstName(first)
-        new_user.setLastName(last)
-        new_user.setEmail(email)
-        new_user.setTotalGPA(gpa)
-
-        return new_user
-
-    @staticmethod
-    def deleteUser(db: DbQuery, id):
-        return db.delete(User._tabel_name, 'userID', id)
-
-    def addUser(self):
-        dictData = self.toJson()
-        return self.db.add(User._tabel_name, dictData)
-
-    def updateUser(self) -> bool:
-        dictData = self.toJson()
-        return self.db.update(User._tabel_name, dictData, 'userID', self.getUserID())
+    def __init__(self, dictData: dict):
+        self.userID: str = dictData['userID']
+        self.firstName: str = dictData['firstName']
+        self.lastName: str = dictData['lastName']
+        self.email: str = dictData['email']
+        self.totalGPA: float = dictData['totalGPA']
+        self.__checkType()
+        self.__chechValue()
 
     def getUserID(self):
         return self.userID
@@ -86,12 +50,12 @@ class User:
         self.totalGPA = gpa
 
     def toJson(self):
-        data = {'userID':self.getUserID(),
+        data = {'userID': self.getUserID(),
                 'firstName': self.getFirstName(),
                 'lastName': self.getLastName(),
                 'email': self.getEmail(),
                 'totalGPA': self.getTotalGPA()
-        }
+                }
 
         return data
 
