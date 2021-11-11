@@ -122,6 +122,7 @@ catData5 = {'categoryID': 1210,
             'semesterID': 2,
             'userID': '6a77b2f176b25fb407294fbcee0ef432e81eac03c32aa0409a10ca306f626815'
             }
+            
 
 assignData1 = {'assignmentID': 11000,
                'assignmentName': 'Exam1',

@@ -2,6 +2,9 @@ import React from "react";
 import AssignmentCategory from "./AssignmentCategory";
 import Assignments from "./Assignments";
 import Categories from "./Categories";
+import Popup from "./Popup";
+import {useState} from 'react';
+
 
 
 class Course extends React.Component
@@ -13,8 +16,14 @@ class Course extends React.Component
             courseName: this.props.courseName,
             courseID: this.props.courseID,
             assignmentCategories: [],
-            assignments: []
-        }
+            assignments: [],
+            popUpButton: false,
+            categoryName: '',
+            categoryWeight: 0,
+        };
+        this.handleChangeCategoryName = this.handleChangeCategoryName.bind(this);
+        this.handleChangeCategoryWeight = this.handleChangeCategoryWeight.bind(this);
+        this.handleSubmitAddCategory = this.handleSubmitAddCategory.bind(this);
         
     }
 
@@ -46,7 +55,6 @@ class Course extends React.Component
               return data;
             })
             this.setState({assignments: this.state.assignments.concat(response)});
-            // console.log(this.state.assignments);
       }
     }
 
@@ -59,30 +67,96 @@ class Course extends React.Component
           if(categoryID == this.state.assignments[m].categoryID)
           {
               array.push(
-                <ul>
-                  {this.state.assignments[m].assignmentName}
-                </ul>
+                <tr style={{border: "1px solid  gray", padding: "3px"}}>
+                    <th style={{border: "1px solid  gray", padding: "3px"}}>
+                        {this.state.assignments[m].assignmentName}
+                    </th>
+                    <th style={{border: "1px solid  gray", padding: "3px"}}>
+                        {this.state.assignments[m].pointsReceived}
+                    </th>
+                    <th style={{border: "1px solid  gray", padding: "3px"}}>
+                        {this.state.assignments[m].totalPoints}
+                    </th>
+                    <th style={{border: "1px solid  gray", padding: "3px"}}>
+                        {this.state.assignments[m].percentGrade}
+                    </th>
+                    <th style={{border: "1px solid  gray", padding: "3px"}}>
+                        {this.state.assignments[m].dueDate}
+                    </th>
+                </tr>
               );
           }
         }
         return array;
       }
 
+
+      handleSubmitAddCategory(event) {
+          //let category = 
+      }
+    
+      handleChangeCategoryName(event) {
+        this.setState({ categoryName: event.target.value });
+      }
+
+      handleChangeCategoryWeight(event) {
+        this.setState({ categoryWeight: event.target.value });
+      }
+
+
     render() {
-        // this.getting();
         
         return (
         <div>
             <h1 className="card card-body mb-3">{this.state.courseName}</h1>
             <div className="container">
-                <h4>Category Weight Category Grade</h4>
+
+                <button style={{'margin-left': "33px", 'margin-bottom': "10px"}} className="btn btn-primary" onClick={() => this.setState({popUpButton: true})}>
+                    Add Category
+                </button>
+                <Popup trigger={this.state.popUpButton}>
+                    <h3>Add Category</h3>
+                        <form className="form-floating"  onSubmit={this.handleSubmitAddCategory}>
+                            <div className="mb-3">
+                                <label htmlFor="categoryName">Category Name</label>
+                                <input type="text" className="form-control"  onChange={this.handleChangeCategoryName} />
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="categoryName">Category Weight</label>
+                                <input type="number" className="form-control"  onChange={this.handleChangeCategoryWeight} />
+                            </div>
+                        </form>
+                        <button style={{'margin-right': "10px"}} className="btn btn-primary" onClick={this.handleSubmitAddCategory}>Submit</button>
+                    
+                    <button className="btn btn-primary" onClick={() => this.setState({popUpButton: false})}>
+                        Cancel
+                    </button>
+                </Popup>
+
                 <ul>
                   {this.state.assignmentCategories.map((categories) =>  (
                     <div>
-                      <h4 key={categories.categoryID}>{categories.categoryName}</h4>
-                      <ul className={'nav-item'} >
-                      {this.displayAssignments(categories.categoryID)}
-                      </ul>
+                      <table style={{width: "100%", 'border-collapse': "collapse"}}>
+                          <tr style={{border: "1px solid  gray", padding: "3px"}}>
+                              <th style={{border: "1px solid  gray", padding: "3px"}}>
+                                  Gradebook Item
+                              </th>
+                              <th style={{border: "1px solid  gray", padding: "3px"}}>
+                                  Points Received
+                              </th>
+                              <th style={{border: "1px solid  gray", padding: "3px"}}>
+                                  Total Points
+                              </th>
+                              <th style={{border: "1px solid  gray", padding: "3px"}}>
+                                  Percent Grade
+                              </th>
+                              <th style={{border: "1px solid  gray", padding: "3px"}}>
+                                  Due Date
+                              </th>
+                          </tr>
+                        <h4 key={categories.categoryID}>{categories.categoryName}</h4>
+                        {this.displayAssignments(categories.categoryID)}
+                      </table>
                     </div>
                   ))}
                 </ul>
