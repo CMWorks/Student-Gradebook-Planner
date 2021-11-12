@@ -50,11 +50,12 @@ class Semesters extends React.Component {
         if(semesterID == this.state.courses[m].semesterID)
         {
             array.push(
-              <ul>
+              <ul key={this.state.courses[m].courseID}>
                 <Link  onClick={(event) => { this.props.set({ courseID: this.state.courses[m].courseID, courseName: this.state.courses[m].courseName, semesterID: this.state.courses[m].semesterID  }) }}
                   to = {{
                     pathname: "/course",
-                  }}>{this.state.courses[m].courseName}</Link>
+                  }}
+                  >{this.state.courses[m].courseName}</Link>
               </ul>
             );
         }
@@ -75,8 +76,8 @@ class Semesters extends React.Component {
                 <h1 className="font-weight-light">Semesters</h1>
                 <ul>
                   {this.state.semesters.map((semester) =>  (
-                    <div>
-                      <h4 key={semester.semesterID}>{semester.semesterName}</h4>
+                    <div key={semester.semesterID}>
+                      <h4>{semester.semesterName}</h4>
                       <ul className={'nav-item'} >
                       {this.displayCourses(semester.semesterID)}
                       </ul>

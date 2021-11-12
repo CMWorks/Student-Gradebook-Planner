@@ -129,6 +129,19 @@ class RESTModule {
 		// return parseInt( crypto.createHash('sha256').update(email + password).digest('hex').split('').reverse().join(''), 16);
 	}
 
+    generateID() {
+        return parseInt(this.__generateIDString(16))
+    }
+
+    __generateIDString(num) {
+        var out = []
+        while (num > 0) {
+            out.push(Math.floor(Math.random()*10));
+            num-=1;
+        }
+        return out.join('')
+    }
+
 	constructor() {
 		this.token = ""
 		this.obj = {}
