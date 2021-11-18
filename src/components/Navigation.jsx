@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, withRouter } from "react-router-dom";
+import Popup from "./Popup";
 
 function Navigation(props) {
   return (
@@ -38,10 +39,20 @@ function Navigation(props) {
                   Final Grade Calculator
                 </Link>
               </li>
+              <li className={'nav-item'}>
+                <button className="btn btn-primary" onClick={() => {console.log("Button clicked!")}}>
+                  Delete Account
+                </button>
+              </li>
             </ul>
           </div>
         </div>
       </nav>
+
+      {/* <Popup trigger={this.state.popUpButton}>
+        <h3>Delete account?</h3>
+      </Popup> */}
+
     </div>
   );
 }
