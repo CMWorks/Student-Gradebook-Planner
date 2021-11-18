@@ -556,5 +556,4 @@ def delete_assignment(id):
 
 
 if __name__ == '__main__':
-    calcualte_user(None, '6a77b2f176b25fb407294fbcee0ef432e81eac03c32aa0409a10ca306f626815')
     api.run()
