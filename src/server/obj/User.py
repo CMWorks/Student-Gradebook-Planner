@@ -1,6 +1,3 @@
-from obj.Semester import Semester
-
-
 class User:
     def __checkType(self):
         if type(self.userID) != str or type(self.firstName) != str or type(self.lastName) != str or type(self.email) != str or (type(self.totalGPA) != float and type(self.totalGPA) != int):
@@ -58,16 +55,3 @@ class User:
                 }
 
         return data
-
-    def updateGPA(self):
-        semesters = Semester.getSemesters(self.db, 'userID', self.userID)
-
-        if len(semesters) == 0:
-            self.setTotalGPA(0)
-            return
-
-        total = 0
-        for sem in semesters:
-            sem.updateGPA()
-            total += sem.getGPA()
-        self.setTotalGPA(total/len(semesters))

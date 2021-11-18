@@ -1,6 +1,7 @@
 from obj.DbHandler import DbHandler
 from database.dbQuery import DbQuery
 from obj.User import User
+from obj.SemesterDbHandler import SemesterDbHandler
 
 
 class UserDbHandler(DbHandler):
@@ -53,3 +54,18 @@ class UserDbHandler(DbHandler):
                 }
 
         return data
+    
+    def updateGPA(db, user: User):
+        semesters = SemesterDbHandler.get(db, 'userID', user.getUserID())
+
+        if len(semesters) == 0:
+            user.setTotalGPA(4.0)
+            UserDbHandler.update(db, user)
+            return
+
+        total = 0
+        for sem in semesters:
+            SemesterDbHandler.updateGPA(db, sem)
+            total += sem.getGPA()
+        user.setTotalGPA(total/len(semesters))
+        UserDbHandler.update(db, user)

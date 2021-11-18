@@ -1,9 +1,5 @@
-from database.dbQuery import DbQuery
-
-
 class Course:
-    def __init__(self, db: DbQuery, dictData: dict = None):
-        self.db = db
+    def __init__(self, dictData: dict = None):
         if dictData is None:
             self.courseID = -1
             self.courseName = ''
@@ -16,20 +12,6 @@ class Course:
             self.creditHours = dictData['creditHours']
             self.courseType = None
             self.userID = dictData['userID']
-
-    @staticmethod
-    def getCourses(db: DbQuery, id):
-        raise NotImplementedError
-
-    @staticmethod
-    def deleteCourses(db: DbQuery, idName, id):
-        raise NotImplementedError
-
-    def addCourse(self):
-        raise NotImplementedError
-
-    def updateCourse(self):
-        raise NotImplementedError
 
     def getCourseID(self):
         return self.courseID
@@ -54,3 +36,6 @@ class Course:
 
     def setUserID(self, id):
         self.userID = id
+        
+    def toJson(self) -> dict:
+        raise NotImplementedError

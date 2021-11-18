@@ -11,14 +11,18 @@ from obj.FutureCourse import FutureCourse
 from obj.Category import Category
 from obj.Assignment import Assignment
 from obj.UserDbHandler import UserDbHandler
+from obj.SemesterDbHandler import SemesterDbHandler
+from obj.CourseDbHandler import CourseDbHandler
+from obj.CategoryDbHandler import CategoryDbHandler
+from obj.AssignmnetDbHandler import AssignmnetDbHandler
 
 api = Flask(__name__)
 
 white = ['http://localhost:3000', 'http://localhost:9000']
 
 
-# db = SQLQuery("database/sqlData.txt")
 db = SQLQuery.getDbQuery("database/sqlData.txt")
+# db = SQLQuery.getDbQuery("serverTest.txt")
 auth = JWTAuth(db)
 
 
@@ -49,6 +53,33 @@ def check_authorization():
         return False
     success = auth.verify(token[7:])
     return success
+
+
+def __calcualte(id):
+    user = UserDbHandler.get(db, 'userID', id)
+    if user is not None:
+        UserDbHandler.updateGPA(db, user)
+
+
+def calcualte_user(name, id):
+    if name == None:
+        __calcualte(id)
+    elif name == Semester:
+        sem = SemesterDbHandler.get(db, 'semesterID', id)
+        if len(sem) == 1:
+            __calcualte(sem[0].userID)
+    elif name == CurrentCourse:
+        course = CourseDbHandler.get(db, 'courseID', id, CourseDbHandler._tabel_name_current)
+        if len(course) == 1:
+            __calcualte(course[0].userID)
+    elif name == Category:
+        category = CategoryDbHandler.get(db, 'categoryID', id)
+        if len(category) == 1:
+            __calcualte(category[0].userID)
+    elif name == Assignment:
+        assign = AssignmnetDbHandler.get(db, 'assignmentID', id)
+        if len(assign) == 1:
+            __calcualte(assign[0].userID)
 
 
 @api.route('/v1/auth/register', methods=['POST'])
@@ -164,7 +195,7 @@ def get_all_semester():
         return {'success': False}, 403
     keyname = query[0]
     key = query[1]
-    semesters = Semester.getSemesters(db, keyname, key)
+    semesters = SemesterDbHandler.get(db, keyname, key)
     data = []
     for sem in semesters:
         data.append(sem.toJson())
@@ -179,7 +210,7 @@ def get_semester(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    semester = Semester.getSemesters(db, 'semesterID', id)
+    semester = SemesterDbHandler.get(db, 'semesterID', id)
     if len(semester) != 1:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -192,8 +223,9 @@ def add_semester():
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
-    sem = Semester(db, data)
-    success = sem.addSemester()
+    sem = Semester(data)
+    success = SemesterDbHandler.add(db, sem)
+    calcualte_user(None, sem.userID)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -206,8 +238,9 @@ def update_semester(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
-    sem = Semester(db, data)
-    success = sem.updateSemester()
+    sem = Semester(data)
+    success = SemesterDbHandler.update(db, sem)
+    calcualte_user(None, sem.userID)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -219,7 +252,8 @@ def delete_semester(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    success = Semester.deleteSemesters(db, 'semesterID', id)
+    calcualte_user(Semester, id)
+    success = SemesterDbHandler.delete(db, 'semesterID', id)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -236,7 +270,8 @@ def get_all_future_course():
         return {'success': False}, 403
     keyname = query[0]
     key = query[1]
-    fCourse = FutureCourse.getCourses(db, keyname, key)
+    fCourse = CourseDbHandler.get(
+        db, keyname, key, CourseDbHandler._tabel_name_future)
     data = []
     for course in fCourse:
         data.append(course.toJson())
@@ -248,7 +283,8 @@ def get_future_course(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    course = FutureCourse.getCourses(db, 'courseID', id)
+    course = CourseDbHandler.get(
+        db, 'courseID', id, CourseDbHandler._tabel_name_future)
     if len(course) != 1:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -261,8 +297,9 @@ def add_future_course():
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
-    course = FutureCourse(db, data)
-    success = course.addCourse()
+    course = FutureCourse(data)
+    success = CourseDbHandler.add(
+        db, course, CourseDbHandler._tabel_name_future)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -275,8 +312,9 @@ def update_future_course(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
-    course = FutureCourse(db, data)
-    success = course.updateCourse()
+    course = FutureCourse(data)
+    success = CourseDbHandler.update(
+        db, course, CourseDbHandler._tabel_name_future)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -288,7 +326,8 @@ def delete_future_course(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    success = FutureCourse.deleteCourses(db, 'courseID', id)
+    success = CourseDbHandler.delete(
+        db, 'courseID', id, CourseDbHandler._tabel_name_future)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -305,7 +344,8 @@ def get_all_current_course():
         return {'success': False}, 403
     keyname = query[0]
     key = query[1]
-    cCourse = CurrentCourse.getCourses(db, keyname, key)
+    cCourse = CourseDbHandler.get(
+        db, keyname, key, CourseDbHandler._tabel_name_current)
     data = []
     for course in cCourse:
         data.append(course.toJson())
@@ -317,7 +357,8 @@ def get_current_course(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    course = CurrentCourse.getCourses(db, 'courseID', id)
+    course = CourseDbHandler.get(
+        db, 'courseID', id, CourseDbHandler._tabel_name_current)
     if len(course) != 1:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -330,8 +371,10 @@ def add_current_course():
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
-    course = CurrentCourse(db, data)
-    success = course.addCourse()
+    course = CurrentCourse(data)
+    success = CourseDbHandler.add(
+        db, course, CourseDbHandler._tabel_name_current)
+    calcualte_user(None, course.userID)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -344,8 +387,10 @@ def update_current_course(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
-    course = CurrentCourse(db, data)
-    success = course.updateCourse()
+    course = CurrentCourse(data)
+    success = CourseDbHandler.update(
+        db, course, CourseDbHandler._tabel_name_current)
+    calcualte_user(None, course.userID)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -357,7 +402,9 @@ def delete_current_course(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    success = CurrentCourse.deleteCourses(db, 'courseID', id)
+    calcualte_user(CurrentCourse, id)
+    success = CourseDbHandler.delete(
+        db, 'courseID', id, CourseDbHandler._tabel_name_current)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -374,7 +421,7 @@ def get_all_category():
         return {'success': False}, 403
     keyname = query[0]
     key = query[1]
-    category = Category.getCategories(db, keyname, key)
+    category = CategoryDbHandler.get(db, keyname, key)
     data = []
     for cat in category:
         data.append(cat.toJson())
@@ -386,7 +433,7 @@ def get_category(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    category = Category.getCategories(db, 'categoryID', id)
+    category = CategoryDbHandler.get(db, 'categoryID', id)
     if len(category) != 1:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -399,8 +446,9 @@ def add_category():
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
-    category = Category(db, data)
-    success = category.addCategory()
+    category = Category(data)
+    success = CategoryDbHandler.add(db, category)
+    calcualte_user(None, category.userID)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -413,8 +461,9 @@ def update_category(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
-    category = Category(db, data)
-    success = category.updateCategory()
+    category = Category(data)
+    success = CategoryDbHandler.update(db, category)
+    calcualte_user(None, category.userID)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -426,7 +475,8 @@ def delete_category(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    success = Category.deleteCategories(db, 'categoryID', id)
+    calcualte_user(Category, id)
+    success = CategoryDbHandler.delete(db, 'categoryID', id)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -443,7 +493,7 @@ def get_all_assignment():
         return {'success': False}, 403
     keyname = query[0]
     key = query[1]
-    assignment = Assignment.getAssignments(db, keyname, key)
+    assignment = AssignmnetDbHandler.get(db, keyname, key)
     data = []
     for ment in assignment:
         data.append(ment.toJson())
@@ -455,7 +505,7 @@ def get_assignment(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    assignment = Assignment.getAssignments(db, 'assignmentID', id)
+    assignment = AssignmnetDbHandler.get(db, 'assignmentID', id)
     if len(assignment) != 1:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -468,8 +518,9 @@ def add_assignment():
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
-    assignment = Assignment(db, data)
-    success = assignment.addAssignment()
+    assignment = Assignment(data)
+    success = AssignmnetDbHandler.add(db, assignment)
+    calcualte_user(None, assignment.userID)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -482,8 +533,9 @@ def update_assignment(id):
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
     data = json.loads(request.data.decode('UTF-8'))
-    assignment = Assignment(db, data)
-    success = assignment.updateAssignment()
+    assignment = Assignment(data)
+    success = AssignmnetDbHandler.update(db, assignment)
+    calcualte_user(None, assignment.userID)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -495,7 +547,8 @@ def delete_assignment(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
-    success = Assignment.deleteAssignments(db, 'assignmentID', id)
+    calcualte_user(Assignment, id)
+    success = AssignmnetDbHandler.delete(db, 'assignmentID', id)
     if not success:
         return {'success': False, 'message': 'Not Found'}, 404
 
@@ -503,4 +556,5 @@ def delete_assignment(id):
 
 
 if __name__ == '__main__':
+    calcualte_user(None, '6a77b2f176b25fb407294fbcee0ef432e81eac03c32aa0409a10ca306f626815')
     api.run()
