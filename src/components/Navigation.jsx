@@ -4,8 +4,37 @@ import { Link, withRouter } from "react-router-dom";
 import Popup from "./Popup";
 
 function Navigation(props) {
-  const [popUpButtonEditAccount, setPopUpButtonEditAccount] = useState(false);
+  const [popUpButtonAccountOptions, setPopUpButtonAccountOptions] = useState(false);
   const [popUpButtonDeleteConfirmation, setPopUpButtonDeleteConfirmation] = useState(false);
+
+
+  const handleSubmitEditAccount = () => {   // Needs to be finished.
+    setPopUpButtonAccountOptions(false);
+    console.log("Should submit account edits.");
+  }
+
+  const handleCancelEditAccount = () => {
+    setPopUpButtonAccountOptions(false);
+  }
+
+  const handleSignOut = () => {   // Needs to be finished.
+    setPopUpButtonAccountOptions(false); 
+    console.log("Should sign out."); 
+  }
+  
+  const handleDeleteAccount = () => {
+    setPopUpButtonDeleteConfirmation(true);
+  }
+
+  const handleConfirmAccountDeletion = () => {  // Needs to be finished.
+    setPopUpButtonDeleteConfirmation(false);
+    setPopUpButtonAccountOptions(false);
+    console.log("Account should be deleted.");
+  }
+
+  const handleCancelAccountDeletion = () => {
+    setPopUpButtonDeleteConfirmation(false);
+  }
   
   return (
     <div className="navigation">
@@ -15,25 +44,28 @@ function Navigation(props) {
             {"Student Planner & Gradebook"}
           </Link>
 
-          <Popup trigger={popUpButtonEditAccount}>
-            <h3>Edit Account</h3>
-            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {setPopUpButtonDeleteConfirmation(true)} }>
-              DELETE ACCOUNT
-            </button>
-            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {setPopUpButtonEditAccount(false); console.log("Submission to be sent.")} }>
+          <Popup trigger={popUpButtonAccountOptions}>
+            <h3>Account Options</h3>
+            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {handleSubmitEditAccount()} }>
               Submit
             </button>
-            <button className="btn btn-primary" onClick={ () => {setPopUpButtonEditAccount((false))} }>
+            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {handleCancelEditAccount()} }>
               Cancel
+            </button>
+            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {handleSignOut()} }>
+              Sign Out
+            </button>
+            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {handleDeleteAccount()} }>
+              DELETE ACCOUNT
             </button>
           </Popup>
 
           <Popup trigger={popUpButtonDeleteConfirmation}>
             <h3>Delete Account?</h3>
-            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {setPopUpButtonDeleteConfirmation(false); setPopUpButtonEditAccount(false); console.log("Account to be deleted.")} }>
+            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {handleConfirmAccountDeletion()} }>
               Confirm
             </button>
-            <button className="btn btn-primary" onClick={ () => {setPopUpButtonDeleteConfirmation(false)}}>
+            <button className="btn btn-primary" onClick={ () => {handleCancelAccountDeletion()}}>
               Cancel
             </button>
           </Popup>
@@ -67,8 +99,8 @@ function Navigation(props) {
                 </Link>
               </li>
               <li className={'nav-item'}>
-                <button className="btn btn-primary" onClick={ () => {setPopUpButtonEditAccount((true))} }>
-                  Edit Account
+                <button className="btn btn-primary" onClick={ () => {setPopUpButtonAccountOptions((true))} }>
+                  Account
                 </button>
               </li>
             </ul>
