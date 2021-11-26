@@ -17,19 +17,22 @@ function Navigation(props) {
     setPopUpButtonAccountOptions(false);
   }
 
-  const handleSignOut = () => {   // Needs to be finished.
+  const handleSignOut = () => { 
     setPopUpButtonAccountOptions(false); 
-    console.log("Should sign out."); 
+    document.location.href = 'http://localhost:3000/'
+    // console.log("Should sign out."); 
   }
   
   const handleDeleteAccount = () => {
     setPopUpButtonDeleteConfirmation(true);
   }
 
-  const handleConfirmAccountDeletion = () => {  // Needs to be finished.
+  const handleConfirmAccountDeletion = () => { 
     setPopUpButtonDeleteConfirmation(false);
     setPopUpButtonAccountOptions(false);
-    console.log("Account should be deleted.");
+    // this.props.server.deleteUserData('users', id);
+    document.location.href = 'http://localhost:3000/';
+    // console.log("Account should be deleted.");
   }
 
   const handleCancelAccountDeletion = () => {
