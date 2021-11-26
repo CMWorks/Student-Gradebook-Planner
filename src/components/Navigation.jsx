@@ -7,10 +7,30 @@ function Navigation(props) {
   const [popUpButtonAccountOptions, setPopUpButtonAccountOptions] = useState(false);
   const [popUpButtonDeleteConfirmation, setPopUpButtonDeleteConfirmation] = useState(false);
 
+  const [inFirstName, setInFirstName] = useState(props.userData.firstName);
+  const [inLastName, setInLastName] = useState(props.userData.lastName);
+  const [inEmail, setInEmail] = useState(props.userData.email);
 
-  const handleSubmitEditAccount = () => {   // Needs to be finished.
+  const handleChangeFName = (event) => {
+    setInFirstName(event.target.value);
+  }
+
+  const handleChangeLName = (event) => {
+    setInLastName(event.target.value);
+  }
+
+  const handleChangeEmail = (event) => {
+    setInEmail(event.target.value);
+  }
+
+  const handleSubmitEditAccount = () => { 
     setPopUpButtonAccountOptions(false);
-    console.log("Should submit account edits.");
+    props.userData.firstName = inFirstName;
+    props.userData.lastName = inLastName;
+    props.userData.email = inEmail;
+    let id = props.userData.userID;
+    props.server.updateUserData('users', id, props.userData);
+    // console.log("Should submit account edits: " + props.userData.firstName + ", " + props.userData.lastName + ", " + props.userData.email);
   }
 
   const handleCancelEditAccount = () => {
@@ -27,10 +47,11 @@ function Navigation(props) {
     setPopUpButtonDeleteConfirmation(true);
   }
 
-  const handleConfirmAccountDeletion = () => { 
+  const handleConfirmAccountDeletion = () => {
     setPopUpButtonDeleteConfirmation(false);
     setPopUpButtonAccountOptions(false);
-    // this.props.server.deleteUserData('users', id);
+    let id = props.userData.userID;
+    props.server.deleteUserData('users', id);
     document.location.href = 'http://localhost:3000/';
     // console.log("Account should be deleted.");
   }
@@ -49,18 +70,36 @@ function Navigation(props) {
 
           <Popup trigger={popUpButtonAccountOptions}>
             <h3>Account Options</h3>
-            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {handleSubmitEditAccount()} }>
-              Submit
-            </button>
-            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {handleCancelEditAccount()} }>
-              Cancel
-            </button>
-            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {handleSignOut()} }>
-              Sign Out
-            </button>
-            <button style={{"marginRight":"10px"}} className="btn btn-primary" onClick={ () => {handleDeleteAccount()} }>
-              DELETE ACCOUNT
-            </button>
+            <div>
+              <label>First name: </label>
+              <input type="text" onChange={handleChangeFName} />
+            </div>
+            <div>
+              <label>Last name: </label>
+              <input type="text" onChange={handleChangeLName} />
+            </div>
+            <div>
+              <label>Email: </label>
+              <input type="text" onChange={handleChangeEmail} />
+            </div>
+            <div>
+              <button style={{"marginRight": "10px", "marginTop": "10px"}} className="btn btn-primary" onClick={ () => {handleSubmitEditAccount()} }>
+                Submit
+              </button>
+              <button style={{"marginTop":"10px"}} className="btn btn-primary" onClick={ () => {handleCancelEditAccount()} }>
+                Cancel
+              </button>
+            </div>
+            <div>
+              <button style={{"marginTop":"30px"}} className="btn btn-primary" onClick={ () => {handleSignOut()} }>
+                Sign Out
+              </button>
+            </div>
+            <div>
+              <button style={{"marginTop":"30px"}} className="btn btn-primary" onClick={ () => {handleDeleteAccount()} }>
+                DELETE ACCOUNT
+              </button>
+            </div>
           </Popup>
 
           <Popup trigger={popUpButtonDeleteConfirmation}>
