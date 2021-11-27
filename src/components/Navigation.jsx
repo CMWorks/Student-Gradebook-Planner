@@ -9,7 +9,6 @@ function Navigation(props) {
 
   const [inFirstName, setInFirstName] = useState(props.userData.firstName);
   const [inLastName, setInLastName] = useState(props.userData.lastName);
-  const [inEmail, setInEmail] = useState(props.userData.email);
 
   const handleChangeFName = (event) => {
     setInFirstName(event.target.value);
@@ -19,17 +18,13 @@ function Navigation(props) {
     setInLastName(event.target.value);
   }
 
-  const handleChangeEmail = (event) => {
-    setInEmail(event.target.value);
-  }
-
   const handleSubmitEditAccount = () => { 
     setPopUpButtonAccountOptions(false);
     props.userData.firstName = inFirstName;
     props.userData.lastName = inLastName;
-    props.userData.email = inEmail;
     let id = props.userData.userID;
     props.server.updateUserData('users', id, props.userData);
+    props.set({"user": props.userData});
     // console.log("Should submit account edits: " + props.userData.firstName + ", " + props.userData.lastName + ", " + props.userData.email);
   }
 
@@ -77,10 +72,6 @@ function Navigation(props) {
             <div>
               <label>Last name: </label>
               <input type="text" onChange={handleChangeLName} />
-            </div>
-            <div>
-              <label>Email: </label>
-              <input type="text" onChange={handleChangeEmail} />
             </div>
             <div>
               <button style={{"marginRight": "10px", "marginTop": "10px"}} className="btn btn-primary" onClick={ () => {handleSubmitEditAccount()} }>
