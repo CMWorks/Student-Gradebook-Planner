@@ -150,7 +150,7 @@ def add_user():
 
 
 @api.route('/v1/users/<id>', methods=['PUT'])
-def update_user():
+def update_user(id):
     authorized = check_authorization()
     if not authorized:
         return {'success': False, 'message': 'Unauthorized'}, 401
