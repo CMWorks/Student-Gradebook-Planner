@@ -46,8 +46,7 @@ function Navigation(props) {
     setPopUpButtonDeleteConfirmation(false);
     setPopUpButtonAccountOptions(false);
     let id = props.userData.userID;
-    props.server.deleteUserData('users', id);
-    document.location.href = 'http://localhost:3000/';
+    props.server.deleteUserData('users', id).then( () => {document.location.href = 'http://localhost:3000/';} );
     // console.log("Account should be deleted.");
   }
 
