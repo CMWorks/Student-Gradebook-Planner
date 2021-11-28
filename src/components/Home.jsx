@@ -4,7 +4,6 @@ class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      assignmentCategories: [],
       assignments: [],
     };
   }
@@ -18,18 +17,50 @@ class Home extends React.Component {
 
   getAssignmentsFromTable = async () => {
     this.props.server.getAllFromTable('assignments', 'userID', this.props.userData.userID).then(retrieve => {
-      console.log('success: ' + retrieve.success);
       this.setState({ assignments: retrieve.data });
     });
   }
 
+  handleMarkAssignmentComplete = (event) => {
+    console.log("Check box got clicked!");
+    // console.log(event);
+    let asgID = +event.target.name;
+
+    // Get the index of the assignment that was just marked as complete.
+    let index = 0;
+    while (this.state.assignments[index].assignmentID != asgID) {
+      index++;
+    }
+    console.log("index: " + index);
+    console.log(this.state.assignments[index]);
+
+    // Update the server, passing the updated assignment object into it.
+    let newAssignment = this.state.assignments[index];
+    newAssignment.isDone = true;
+    console.log(newAssignment);
+    this.props.server.updateUserData('assignments', asgID, newAssignment);
+  }
 
   displayUnfinishedAssignments() {
     let array = [];
+    // console.log(this.state.assignments);
+
+    // Insert all unfinished assignments into the list.
     for (let i = 0; i < this.state.assignments.length; i++) {
-      // If the assignment is unfinished, insert it into the list.
       if (this.state.assignments[i].isDone != true) {
-        array.push(<li>{this.state.assignments[i].assignmentName}, due {this.state.assignments[i].dueDate}</li>);
+        array.push(
+          <li>
+            {/* Each list item displays the assignment name, due date, and a check box. */}
+            {this.state.assignments[i].assignmentName} |  
+            Due {this.state.assignments[i].dueDate} | 
+            Done:
+            <input
+              type="checkbox"
+              name={this.state.assignments[i].assignmentID}   // Each check box uses its corresponding assignment's ID to identify itself.
+              onClick={this.handleMarkAssignmentComplete}
+            /> 
+          </li>
+        );
       }
     }
     return array;
