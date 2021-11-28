@@ -24,6 +24,7 @@ class UserDbHandler(DbHandler):
     @staticmethod
     def delete(db: DbQuery, idName: str, id) -> bool:
         try:
+            db.delete("CREDENTIALS", 'userID', id)
             return db.delete(UserDbHandler._tabel_name, 'userID', id)
         except Exception:
             return False
