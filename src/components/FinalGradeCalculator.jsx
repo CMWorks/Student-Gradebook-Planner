@@ -51,7 +51,7 @@ class FinalGradeCalculator extends React.Component
                 <form>
                     <label>
                         Current grade is
-                        <input name="curGrade" type="number" value={this.state.curGrade} onChange={this.handleChange} />
+                        <input name="curGrade" type="text" value={this.state.curGrade} onChange={this.handleChange} />
                         %.
                     </label>
                 </form>
@@ -60,7 +60,7 @@ class FinalGradeCalculator extends React.Component
                 <form>
                     <label>
                         I want a 
-                        <input name="desiredGrade" type="number" value={this.state.desiredGrade} onChange={this.handleChange} />
+                        <input name="desiredGrade" type="text" value={this.state.desiredGrade} onChange={this.handleChange} />
                         % in the class.
                     </label>
                 </form>
@@ -69,7 +69,7 @@ class FinalGradeCalculator extends React.Component
                 <form>
                     <label>
                         Final is worth 
-                        <input name="finalWeight" type="number" value={this.state.finalWeight} onChange={this.handleChange} />
+                        <input name="finalWeight" type="text" value={this.state.finalWeight} onChange={this.handleChange} />
                         % of total grade.
                     </label>
                 </form>
