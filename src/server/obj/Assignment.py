@@ -101,7 +101,7 @@ class Assignment:
                 'totalPoints': self.getTotalPoints(),
                 'percentGrade': self.getPercentGrade(),
                 'dueDate': self.getDueDate(),
-                'isDone': self.getIsDone(),
+                'isDone': int(self.getIsDone()),
                 'categoryID': self.getCategoryID(),
                 'courseID': self.getCourseID(),
                 'semesterID': self.getSemesterID(),
