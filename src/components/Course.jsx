@@ -13,6 +13,9 @@ class Course extends React.Component {
         this.state = {
             courseName: this.props.courseName,
             courseID: this.props.courseID,
+            gradePercent: 0,
+            gradeLetter: '',
+            totalWeight: 0,
             semesterID: this.props.semesterID,
             categoryID: 0,
             assignmentCategories: [],
@@ -23,6 +26,7 @@ class Course extends React.Component {
             popUpButtonDeleteCategory: false,
             popUpButtonEditAssignment: false,
             popUpButtonDeleteAssignment: false,
+            popUpButtonErrorCategory: false,
             assignmentID: 0,
             categoryName: '',
             categoryWeight: 0,
@@ -59,7 +63,6 @@ class Course extends React.Component {
             this.setState({ assignmentCategories: retrieve.data });
             console.log(this.state.assignmentCategories);
             this.getAssignmentInfo();
-
         });
     }
 
@@ -75,6 +78,7 @@ class Course extends React.Component {
             })
             this.setState({ assignments: this.state.assignments.concat(response) });
         }
+        this.calculateGrade();
     }
 
     displayAssignments(categoryID) {
@@ -85,19 +89,19 @@ class Course extends React.Component {
             if (categoryID == this.state.assignments[m].categoryID) {
                 array.push(
                     <tr style={{ border: "1px solid  gray", padding: "3px" }}>
-                        <th style={{ border: "1px solid  gray", padding: "3px" }}>
+                        <th style={{ width: "10vw", border: "1px solid  gray", padding: "3px" }}>
                             {this.state.assignments[m].assignmentName}
                         </th>
-                        <th style={{ border: "1px solid  gray", padding: "3px" }}>
+                        <th style={{ width: "10vw", border: "1px solid  gray", padding: "3px" }}>
                             {this.state.assignments[m].pointsReceived}
                         </th>
-                        <th style={{ border: "1px solid  gray", padding: "3px" }}>
+                        <th style={{width: "10vw", border: "1px solid  gray", padding: "3px" }}>
                             {this.state.assignments[m].totalPoints}
                         </th>
-                        <th style={{ border: "1px solid  gray", padding: "3px" }}>
-                            {this.state.assignments[m].percentGrade}
+                        <th style={{width: "10vw", border: "1px solid  gray", padding: "3px" }}>
+                            {this.state.assignments[m].percentGrade.toFixed(2)}
                         </th>
-                        <th style={{ border: "1px solid  gray", padding: "3px" }}>
+                        <th style={{width: "10vw", border: "1px solid  gray", padding: "3px" }}>
                             {this.state.assignments[m].dueDate}
                         </th>
                     </tr>
@@ -118,13 +122,31 @@ class Course extends React.Component {
             semesterID: this.state.semesterID,
             userID: this.props.userData.userID
         }
-        if (this.state.categoryName === "" || this.state.categoryWeight === "") {
+        let totalWeight = parseInt(this.state.categoryWeight);
+        for (let i = 0; i < this.state.assignmentCategories.length; i++){
+            totalWeight = totalWeight + this.state.assignmentCategories[i].weight;
+        }
+        if (this.state.categoryName === "") {
             event.preventDefault();
+            document.getElementById("categoryName").classList.add("is-invalid")
             return
         }
-        console.log(Category);
+        if(this.state.categoryWeight === 0)
+        {
+            event.preventDefault();
+            document.getElementById("categoryWeight").classList.add("is-invalid")
+            return
+        }
+        if(totalWeight > 100)
+        {
+            event.preventDefault();
+            document.getElementById("categoryWeight").classList.add("is-invalid")
+            this.setState({popUpButtonErrorCategory: true})
+            return
+        }
         this.props.server.addUserData('categories', Category);
         this.setState({ popUpButton: false });
+        this.calculateGrade();
         event.preventDefault();
     }
 
@@ -139,25 +161,56 @@ class Course extends React.Component {
             semesterID: this.state.semesterID,
             userID: this.props.userData.userID
         }
-        if (this.state.categoryName === "" || this.state.categoryWeight === "") {
+        let totalWeight = parseInt(this.state.categoryWeight);
+        for (let i = 0; i < this.state.assignmentCategories.length; i++){
+            totalWeight = totalWeight + this.state.assignmentCategories[i].weight;
+        }
+        if (this.state.categoryName === "") {
             event.preventDefault();
+            document.getElementById("categoryName1").classList.add("is-invalid")
+            return
+        }
+        if(this.state.categoryWeight === 0)
+        {
+            event.preventDefault();
+            document.getElementById("categoryWeight1").classList.add("is-invalid")
+            return
+        }
+        if(totalWeight > 100)
+        {
+            event.preventDefault();
+            document.getElementById("categoryWeight1").classList.add("is-invalid")
+            this.setState({popUpButtonErrorCategory: true})
             return
         }
         // console.log(Category);
         this.props.server.updateUserData('categories', this.state.categoryID ,Category);
         this.setState({ popUpButtonEditCategory: false });
+        this.calculateGrade();
         event.preventDefault();
     }
 
     handleSubmitDeleteCategory(event) {
+        if (this.state.categoryID === 0) {
+            event.preventDefault();
+            document.getElementById("deleteCategory").classList.add("is-invalid")
+            return
+        }
         this.props.server.deleteUserData('categories', this.state.categoryID);
         this.setState({popUpButtonDeleteCategory: false});
+        this.calculateGrade();
         event.preventDefault();
     }
 
     handleSubmitDeleteAssignment(event) {
+        if (this.state.assignmentID === 0) {
+            event.preventDefault();
+            document.getElementById("assignmentIDDelete").classList.add("is-invalid")
+            return
+        }
         this.props.server.deleteUserData('assignments', this.state.assignmentID);
         this.setState({popUpButtonDeleteAssignment: false});
+        this.calculateGrade();
         event.preventDefault();
     }
 
@@ -193,13 +246,27 @@ class Course extends React.Component {
             semesterID: this.state.semesterID,
             userID: this.props.userData.userID
         }
-        console.log(Assignment);
-        if (this.state.assignmentName === "" || this.state.categoryID === 0 || this.state.totalPoints === 0) {
+        // console.log(Assignment);
+        if (this.state.assignmentName === "") {
             event.preventDefault();
+            document.getElementById("assignmentNameAdd").classList.add("is-invalid")
+            return
+        }
+        if(this.state.categoryID === 0)
+        {
+            event.preventDefault();
+            document.getElementById("categoryIDAdd").classList.add("is-invalid")
+            return
+        }
+        if(this.state.totalPoints === 0)
+        {
+            event.preventDefault();
+            document.getElementById("totalPointsAdd").classList.add("is-invalid")
             return
         }
         this.props.server.addUserData('assignments', Assignment);
         this.setState({ popUpButtonAssignment: false });
+        this.calculateGrade();
         event.preventDefault();
     }
     
@@ -217,13 +284,32 @@ class Course extends React.Component {
             semesterID: this.state.semesterID,
             userID: this.props.userData.userID
         }
-        console.log(Assignment);
-        if (this.state.assignmentName === "" || this.state.categoryID === 0 || this.state.totalPoints === 0) {
+        // console.log(Assignment);
+        if (this.state.assignmentID === 0) {
             event.preventDefault();
+            document.getElementById("assignmentIDEdit").classList.add("is-invalid")
+            return
+        }
+        if (this.state.assignmentName === "") {
+            event.preventDefault();
+            document.getElementById("assignmentNameEdit").classList.add("is-invalid")
+            return
+        }
+        if(this.state.categoryID === 0)
+        {
+            event.preventDefault();
+            document.getElementById("categoryIDEdit").classList.add("is-invalid")
+            return
+        }
+        if(this.state.totalPoints === 0)
+        {
+            event.preventDefault();
+            document.getElementById("totalPointsEdit").classList.add("is-invalid")
             return
         }
         this.props.server.updateUserData('assignments', this.state.assignmentID, Assignment);
         this.setState({ popUpButtonEditAssignment: false });
+        this.calculateGrade();
         event.preventDefault();
     }
 
@@ -246,15 +332,60 @@ class Course extends React.Component {
     handleChangeAssignmentIsDone(event) {
         this.setState({ isDone: event.target.value });
     }
-    
-    
+
+    calculateGrade(){
+        let percentGradeTotal = 100;
+        let percentGradeCat = 0;
+        let totalCatPoints = 0;
+        let earnedCatPoints = 0;
+        let categoryID = 0;
+        let categoryWeight = 0;
+        for (let i = 0; i < this.state.assignmentCategories.length; i++){
+            totalCatPoints = 0;
+            earnedCatPoints = 0;
+            categoryID = this.state.assignmentCategories[i].categoryID;
+            categoryWeight = this.state.assignmentCategories[i].weight;
+            for (let m = 0; m < this.state.assignments.length; m++) {
+                if (categoryID == this.state.assignments[m].categoryID) {
+                    totalCatPoints = totalCatPoints + this.state.assignments[m].totalPoints;
+                    earnedCatPoints = earnedCatPoints + this.state.assignments[m].pointsReceived;
+                }
+            }
+            percentGradeCat = (earnedCatPoints/totalCatPoints);
+            percentGradeCat = percentGradeCat*categoryWeight;
+            if(!isNaN(percentGradeCat))
+            {
+                percentGradeTotal = percentGradeTotal - (categoryWeight - percentGradeCat);
+            }
+        }
+        this.setState({gradePercent: percentGradeTotal});
+        if(percentGradeTotal >= 90)
+        {
+            this.setState({gradeLetter: 'A'});
+        }
+        else if(percentGradeTotal >= 80)
+        {
+            this.setState({gradeLetter: 'B'});
+        }
+        else if(percentGradeTotal >= 70)
+        {
+            this.setState({gradeLetter: 'C'});
+        }
+        else if(percentGradeTotal >= 60)
+        {
+            this.setState({gradeLetter: 'D'});
+        }
+        else
+        {
+            this.setState({gradeLetter: 'F'});
+        }
+    }
 
     render() {
-        
         return (
-            <div>
-                <h1 className="card card-body mb-3">{this.state.courseName}</h1>
-                <div className="container">
+            <div  style={{overflow: "auto", height: "770px"}}>
+                <h1 className="card card-body mb-3">{this.state.courseName} - {this.state.gradeLetter} ({this.state.gradePercent.toFixed(2)}%)</h1>
+                <div className="container" >
 
                     <button style={{ 'margin-left': "33px", 'marginBottom': "10px" }} className="btn btn-primary" onClick={() => this.setState({ popUpButton: true })}>
                         Add Category
@@ -265,11 +396,11 @@ class Course extends React.Component {
                         <form className="form-floating" onSubmit={this.handleSubmitAddCategory}>
                             <div className="mb-3">
                                 <label htmlFor="categoryName">Category Name</label>
-                                <input type="text" className="form-control" onChange={this.handleChangeCategoryName} />
+                                <input type="text" className="form-control" id="categoryName" onChange={this.handleChangeCategoryName} />
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="categoryWeight">Category Weight</label>
-                                <input type="number" className="form-control" onChange={this.handleChangeCategoryWeight} />
+                                <input type="number" className="form-control" id="categoryWeight" onChange={this.handleChangeCategoryWeight} />
                             </div>
                         </form>
                         <button style={{ 'margin-right': "10px" }} className="btn btn-primary" onClick={this.handleSubmitAddCategory}>Submit</button>
@@ -297,11 +428,11 @@ class Course extends React.Component {
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="categoryName">Category Name</label>
-                                <input type="text" className="form-control" onChange={this.handleChangeCategoryName} />
+                                <input type="text" className="form-control" id="categoryName1" onChange={this.handleChangeCategoryName} />
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="categoryWeight">Category Weight</label>
-                                <input type="number" className="form-control" onChange={this.handleChangeCategoryWeight} />
+                                <input type="number" className="form-control" id="categoryWeight1" onChange={this.handleChangeCategoryWeight} />
                             </div>
                         </form>
                         <button style={{ 'margin-right': "10px" }} className="btn btn-primary" onClick={this.handleSubmitEditCategory}>Submit</button>
@@ -320,7 +451,7 @@ class Course extends React.Component {
                         <form className="form-floating" onSubmit={this.handleSubmitDeleteCategory}>
                             <div className="mb-3">
                                 <label htmlFor="category">Category</label>
-                                <select className="form-control" onChange={this.handleChangeCategoryID}>\
+                                <select className="form-control" id="deleteCategory" onChange={this.handleChangeCategoryID}>\
                                     <option value=''></option>
                                     {this.state.assignmentCategories.map((categories) => (
                                             <option value={categories.categoryID}>{categories.categoryName}</option>
@@ -343,7 +474,7 @@ class Course extends React.Component {
                         <form className="form-floating" onSubmit={this.handleSubmitAddAssignment}>
                             <div className="mb-3">
                                 <label htmlFor="assignmentName">Assignment Name</label>
-                                <input type="text" className="form-control" onChange={this.handleChangeAssignmentName} />
+                                <input type="text" className="form-control" id="assignmentNameAdd" onChange={this.handleChangeAssignmentName} />
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="pointsReceived">Points Received</label>
@@ -351,7 +482,7 @@ class Course extends React.Component {
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="totalPoints">Total Points</label>
-                                <input type="number" className="form-control" onChange={this.handleChangeAssignmentTotalPoints} />
+                                <input type="number" className="form-control" id="totalPointsAdd" onChange={this.handleChangeAssignmentTotalPoints} />
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="dueDate">Due Date</label>
@@ -367,7 +498,7 @@ class Course extends React.Component {
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="category">Category</label>
-                                <select className="form-control" onChange={this.handleChangeCategoryID}>\
+                                <select className="form-control" id="categoryIDAdd" onChange={this.handleChangeCategoryID}>\
                                     <option value=''></option>
                                     {this.state.assignmentCategories.map((categories) => (
                                             <option value={categories.categoryID}>{categories.categoryName}</option>
@@ -390,7 +521,7 @@ class Course extends React.Component {
                         <form className="form-floating" onSubmit={this.handleSubmitEditAssignment}>
                             <div className="mb-3">
                                 <label htmlFor="category">Assignments</label>
-                                <select className="form-control" onChange={this.handleChangeAssignmentID}>\
+                                <select className="form-control" id="assignmentIDEdit" onChange={this.handleChangeAssignmentID}>
                                     <option value=''></option>
                                     {this.state.assignments.map((assignment) => (
                                             <option value={assignment.assignmentID}>{assignment.assignmentName}</option>
@@ -399,7 +530,7 @@ class Course extends React.Component {
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="assignmentName">Assignment Name</label>
-                                <input type="text" className="form-control" onChange={this.handleChangeAssignmentName} />
+                                <input type="text" className="form-control" id="assignmentNameEdit" onChange={this.handleChangeAssignmentName} />
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="pointsReceived">Points Received</label>
@@ -407,7 +538,7 @@ class Course extends React.Component {
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="totalPoints">Total Points</label>
-                                <input type="number" className="form-control" onChange={this.handleChangeAssignmentTotalPoints} />
+                                <input type="number" className="form-control" id="totalPointsEdit" onChange={this.handleChangeAssignmentTotalPoints} />
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="dueDate">Due Date</label>
@@ -423,7 +554,7 @@ class Course extends React.Component {
                             </div>
                             <div className="mb-3">
                                 <label htmlFor="category">Category</label>
-                                <select className="form-control" onChange={this.handleChangeCategoryID}>\
+                                <select className="form-control" id="categoryIDEdit" onChange={this.handleChangeCategoryID}>\
                                     <option value=''></option>
                                     {this.state.assignmentCategories.map((categories) => (
                                             <option value={categories.categoryID}>{categories.categoryName}</option>
@@ -444,10 +575,10 @@ class Course extends React.Component {
                     <Popup trigger={this.state.popUpButtonDeleteAssignment}>
                         <h3>Delete Assignment</h3>
                         
-                        <form className="form-floating" onSubmit={this.handleSubmitDeleteAssignment}>
+                        <form className="form-floating"  onSubmit={this.handleSubmitDeleteAssignment}>
                             <div className="mb-3">
                                 <label htmlFor="category">Assignment</label>
-                                <select className="form-control" onChange={this.handleChangeAssignmentID}>\
+                                <select className="form-control" id="assignmentIDDelete" onChange={this.handleChangeAssignmentID}>\
                                     <option value=''></option>
                                     {this.state.assignments.map((assignment) => (
                                             <option value={assignment.assignmentID}>{assignment.assignmentName}</option>
@@ -462,35 +593,43 @@ class Course extends React.Component {
                         </button>
                     </Popup>
 
+                    <Popup trigger={this.state.popUpButtonErrorCategory}>
+                        <h3>Error</h3>
+                        <p>Total category weights cannot be greater than 100.</p>
+                        <button className="btn btn-primary" onClick={() => this.setState({ popUpButtonErrorCategory: false })}>
+                            Ok
+                        </button>
+                    </Popup>
+                    <hr />
+                    <div>
                     <table style={{ width: "100%", 'border-collapse': "collapse" }}>
                         <tr style={{ border: "1px solid  gray", padding: "3px" }}>
-                            <th style={{ border: "1px solid  gray", padding: "3px" }}>
+                            <th style={{width: "10vw", border: "1px solid  gray", padding: "3px" }}>
                                 Gradebook Item
                             </th>
-                            <th style={{ border: "1px solid  gray", padding: "3px" }}>
+                            <th style={{width: "10vw", border: "1px solid  gray", padding: "3px" }}>
                                 Points Received
                             </th>
-                            <th style={{ border: "1px solid  gray", padding: "3px" }}>
+                            <th style={{width: "10vw", border: "1px solid  gray", padding: "3px" }}>
                                 Total Points
                             </th>
-                            <th style={{ border: "1px solid  gray", padding: "3px" }}>
+                            <th style={{width: "10vw", border: "1px solid  gray", padding: "3px" }}>
                                 Percent Grade
                             </th>
-                            <th style={{ border: "1px solid  gray", padding: "3px" }}>
+                            <th style={{width: "10vw", border: "1px solid  gray", padding: "3px" }}>
                                 Due Date
                             </th>
                         </tr>
                     </table>
-                    <ul>
+                    </div>
                         {this.state.assignmentCategories.map((categories) => (
-                            <div>
+                            <div style={{ width: "100%"}}>
                                 <table style={{ width: "100%", 'borderCollapse': "collapse" }}>
                                     <h4 key={categories.categoryID}>{categories.categoryName}  -  {categories.weight}</h4>
                                     {this.displayAssignments(categories.categoryID)}
                                 </table>
                             </div>
                         ))}
-                    </ul>
                 </div>
 
             </div>
