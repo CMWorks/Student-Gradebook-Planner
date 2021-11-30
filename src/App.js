@@ -35,7 +35,6 @@ class App extends React.Component {
               <Route path="/final-grade-calculator" exact component={() => <FinalGradeCalculator />} />
               <Route path="/course" exact component={() => <Course userData={this.state.user} courseID={this.state.courseID} courseName={this.state.courseName} semesterID={this.state.semesterID} server={this.server} set={(obj) => this.setState(obj) } />} />
             </Switch>
-            <Footer />
           </Router>
         </div>
       );
