@@ -1,87 +1,138 @@
 import React from "react";
+import ToDoListItem from "./ToDoListItem";
 
 class Home extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      assignments: [],
-      checkboxIDs: [],
-      // checked: {},
+      unfinishedAssignments: [], 
+      checked: {},
+      isNoneClicked: false,
     };
     this.getAssignmentsFromTable();
   }
 
-  // componentDidMount = async () => {
-  //   this.props.server.getAllFromTable('assignments', 'userID', this.props.userData.userID).then(retrieve => {
-  //     console.log('success: ' + retrieve.success);
-  //     this.setState({ assignments: retrieve.data });
-  //   });
-  // }
-
   getAssignmentsFromTable = async () => {
     this.props.server.getAllFromTable('assignments', 'userID', this.props.userData.userID).then(retrieve => {
-      this.setState({ assignments: retrieve.data });
+      let assignments = retrieve.data;
+      let localUnfinishedAssignments = [];
+
+      // Create a local array of unfinished assignments.
+      for (let i = 0; i < assignments.length; i++) {
+        if (!assignments[i].isDone) {
+          localUnfinishedAssignments.push(assignments[i]);
+        }
+      }
+      // Create a local object to track the condition of each assignment.
+      let localChecked = localUnfinishedAssignments.reduce(
+        (asgIDs, asg) => ({
+          ...asgIDs,
+          [asg.assignmentID]: false,
+        }),
+        {}
+      );
+      // Assign the state the values of the local array and object.
+      this.setState({ unfinishedAssignments: localUnfinishedAssignments });
+      this.setState({ checked: localChecked });
     });
   }
 
   handleCheckboxChange = (event) => {
     console.log("Check box got clicked!");
     console.log(event.target);
+
+    // Capture the name (i.e., assignmentID) of the checkbox.
+    const { name } = event.target;
+    
+    // Toggle the "checked" condition of the assignment that was just clicked.
+    this.setState( (prevState) => ({
+      checked: {
+        ...prevState.checked,
+        [name]: !prevState.checked[name]
+      }
+    }));
+
     // console.log(this.state.checked);
-    // let asgID = +event.target.name;
+    
+    // Check whether there are no check boxes clicked.
+    // this.setState({ isNoneClicked: this.checkNoneClicked() });  // This method call does not quite work.
+  }
 
-    // // Get the index of the assignment that was just marked as complete.
-    // let index = 0;
-    // while (this.state.assignments[index].assignmentID != asgID) {
-    //   index++;
-    // }
-    // console.log("index: " + index);
-    // console.log(this.state.assignments[index]);
-
-    // // Update the server, passing the updated assignment object into it.
-    // let newAssignment = this.state.assignments[index];
-    // newAssignment.isDone = true;
-    // console.log(newAssignment);
-    // this.props.server.updateUserData('assignments', asgID, newAssignment);
+  checkNoneClicked = () => {
+    // Loop through the values of each assignment in state.
+    for (let i = 0; i < this.state.unfinishedAssignments.length; i++) {
+      // If one is checked, return false.
+      let curAsg = this.state.unfinishedAssignments[i];
+      if (this.state.checked[curAsg.assignmentID]) {
+        console.log(" - Asg #"+curAsg.assignmentID+" is checked.");
+        return false;
+      }
+    }
+    // Otherwise, if program looped through all values, return true.
+    console.log(" - No assignments checked.")
+    return true;
   }
 
   handleSubmit = (event) => {
+    event.preventDefault();
     console.log("Submit button got clicked!");
     console.log(event.target);
-    event.preventDefault();
+    console.log(this.state.checked);
+
+    // Create two local arrays representing the still-unfinished and newly-finished assignments.
+    let localUnfinishedAssignments = [];
+    let finishedAssignments = []
+    for (let i = 0; i < this.state.unfinishedAssignments.length; i++) {
+      let curAsg = this.state.unfinishedAssignments[i];
+      if (!this.state.checked[curAsg.assignmentID]) {
+        // This assignment is still unfinished.
+        localUnfinishedAssignments.push(curAsg);
+      } else {
+        // This is a newly-finised assignment.
+        curAsg.isDone = true;
+        finishedAssignments.push(curAsg);
+      }
+    }
+    // Create a new checked object to track the still-unfinished assignments.
+    let newChecked = localUnfinishedAssignments.reduce(
+      (asgIDs, asg) => ({
+        ...asgIDs,
+        [asg.assignmentID]: false,
+      }),
+      {}
+    );
+
+    // Set the state to represent the new checked object and the still-unfinished assignments.
+    this.setState({ unfinishedAssignments: localUnfinishedAssignments })
+    this.setState({ checked: newChecked })
+
+    // Update the server with the newly-finished assignments.
+    for (let i = 0; i < finishedAssignments.length; i++) {
+      let curAsg = finishedAssignments[i];
+      this.props.server.updateUserData('assignments', curAsg.assignmentID, curAsg);
+    }
   }
+
+  createListItem = (assignment) => (
+    <ToDoListItem 
+      item={assignment}
+      isSelected={this.state.checked[assignment.assignmentID]}
+      onCheckboxChange={this.handleCheckboxChange}
+      key={assignment.assignmentID}
+    />
+  );
 
   displayUnfinishedAssignments() {
     let array = [];
-    // console.log(this.state.assignments);
 
     // Insert all unfinished assignments into the list.
-    for (let i = 0; i < this.state.assignments.length; i++) {
-      if (this.state.assignments[i].isDone != true) {
-        let asgID = this.state.assignments[i].assignmentID;
-        array.push(
-          <li key={asgID}>
-            {/* Each list item displays the assignment name, due date, and a check box. */}
-            {this.state.assignments[i].assignmentName} |  
-            Due {this.state.assignments[i].dueDate} | 
-            Done:
-            <input
-              type="checkbox"
-              name={asgID}   // Each check box uses its corresponding assignment's ID to identify itself.
-              onChange={this.handleCheckboxChange}
-            /> 
-          </li>
-        );
-        // this.setState( { checkboxIDs: checkboxIDs.append(asgID) } );
-        
-        // this.setState( (prevState) => {
-        //   let checked = { ...prevState.checked };
-        //   checked[asgID] = false;
-        //   return { checked };
-        // });
-      }
+    for (let i = 0; i < this.state.unfinishedAssignments.length; i++) {
+      array.push(
+        this.createListItem(this.state.unfinishedAssignments[i])
+      );
     }
-    console.log(this.state.checked);
+    // console.log(this.state.checked);
+    // console.log(array);
     return array;
   }
 
@@ -111,7 +162,7 @@ class Home extends React.Component {
                 <ul>
                   { this.displayUnfinishedAssignments() }
                 </ul>
-                <button type="submit" className="btn btn-primary" disabled={false}>
+                <button type="submit" className="btn btn-primary" disabled={this.state.isNoneClicked}>
                   Submit
                 </button>
               </form>
