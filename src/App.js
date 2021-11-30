@@ -26,7 +26,7 @@ class App extends React.Component {
       return (
         <div className="App">
           <Router>
-            <Navigation />
+            <Navigation userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />
             <Switch>
               <Route path="/" exact component={() => <Home userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
               <Route path="/about" exact component={() => <About userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
