@@ -31,7 +31,7 @@ class FutureCourse extends React.Component{
     } //Constructor
     
     componentDidMount = async () =>{
-        this.props.server.getAllFromTable('futureCourse', 'userID', this.props.userID).then(retrieve => {
+        this.props.server.getAllFromTable('futureCourses', 'userID', this.props.userID).then(retrieve => {
             let success = retrieve.success;
             let data = retrieve.data;
 
@@ -76,7 +76,7 @@ class FutureCourse extends React.Component{
                         Add Planned Course
                     </button>
                     
-                    {/* <Popup trigger={this.state.popUpButton}>
+                    <Popup trigger={this.state.popUpButton}>
                         <h3>Add Planned Course</h3>
                         <form className="form-floating" onSubmit={this.handleSubmitAddCategory}>
                             <div className="mb-3">
@@ -97,7 +97,7 @@ class FutureCourse extends React.Component{
                         <button className="btn btn-primary" onClick={() => this.setState({ popUpButton: false })}>
                             Cancel
                         </button>
-                    </Popup>  */}
+                    </Popup> 
                     <hr />
                     <div>
                     <table style={{ width: "100%", 'border-collapse': "collapse" }}>
@@ -114,10 +114,10 @@ class FutureCourse extends React.Component{
                         </tr>
                     </table>
                     </div>
-                        {this.state.futureCourses.map(() => (
+                        {this.state.futureCourses.map((futureCourses) => (
                             <div style={{ width: "100%"}}>
                                 <table style={{ width: "100%", 'borderCollapse': "collapse" }}>
-                                    <h4 key={this.userID}>{this.futureCourse}</h4>
+                                    <h4 key={futureCourses.courseID}>{futureCourses.courseName}</h4>
                                     {this.displayFutureCourses()}
                                 </table>
                             </div>
