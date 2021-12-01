@@ -130,6 +130,11 @@ function Navigation(props) {
                   Final Grade Calculator
                 </Link>
               </li>
+              <li className = {'nav-item'}>
+                <Link className = {'nav-link ' + (props.location.pathname === "/future-courses" ? "active" : "")} to = "/future-courses">
+                  Planned Courses
+                  </Link>
+              </li>
               <li className={'nav-item'}>
                 <button className="btn btn-primary" onClick={ () => {setPopUpButtonAccountOptions((true))} }>
                   Account

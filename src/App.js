@@ -4,6 +4,7 @@ import { Navigation, Footer, Home, About, Contact, Course, Login, Signup, Semest
 import RESTModule from "./server/wpRESTModule";
 import AssignmentCategory from "./components/AssignmentCategory";
 import Assignment from "./components/Assignment";
+import FutureCourse from "./components/FutureCourse";
 
 class App extends React.Component {
 
@@ -32,6 +33,7 @@ class App extends React.Component {
               <Route path="/about" exact component={() => <About userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
               <Route path="/contact" exact component={() => <Contact userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
               <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
+              <Route path="/future-courses" exact component={() => <FutureCourse userData={this.state.user}server={this.server}set={(obj) => this.setState(obj)} />} />
               <Route path="/final-grade-calculator" exact component={() => <FinalGradeCalculator />} />
               <Route path="/course" exact component={() => <Course userData={this.state.user} courseID={this.state.courseID} courseName={this.state.courseName} semesterID={this.state.semesterID} server={this.server} set={(obj) => this.setState(obj) } />} />
             </Switch>
