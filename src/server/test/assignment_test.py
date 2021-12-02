@@ -153,7 +153,28 @@ def test_deleteAssignment_invalidID_false():
     
     assert not success and len(new_assign) != 0
 
-
+def test_markAssignment_correctData_true():
+    assignment = setup()
+    
+    assignment.setIdDone(True)
+    
+    success = AssignmentDbHandler.update(db, assignment)
+    new_assign = AssignmentDbHandler.get(db, "assignmentID", assignment.assignmentID)[0]
+    
+    cleanup()
+    
+    assert success and assignment.toJson() == new_assign.toJson()
+    
+def test_markAssignment_invalidData_KeyError():
+    with pytest.raises(KeyError) as exc_info:
+        assignment = Assignment({})
+        
+    cleanup()
+        
+    exception_raised = exc_info.value
+    assert exception_raised
+    
+    
 def test_cleanup():
     cleanup()
     assert True
