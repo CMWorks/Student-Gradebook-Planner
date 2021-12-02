@@ -3,7 +3,7 @@ class User:
         if type(self.userID) != str or type(self.firstName) != str or type(self.lastName) != str or type(self.email) != str or (type(self.totalGPA) != float and type(self.totalGPA) != int):
             raise TypeError
 
-    def __chechValue(self):
+    def __checkValue(self):
         if self.totalGPA < 0:
             raise ValueError
 
@@ -14,7 +14,7 @@ class User:
         self.email: str = dictData['email']
         self.totalGPA: float = dictData['totalGPA']
         self.__checkType()
-        self.__chechValue()
+        self.__checkValue()
 
     def getUserID(self):
         return self.userID

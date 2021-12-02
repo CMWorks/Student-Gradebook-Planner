@@ -9,8 +9,8 @@ from obj.Course import Course
 
 class CourseDbHandler(DbHandler):
 
-    _tabel_name_future = 'FUTURE_COURSE'
-    _tabel_name_current = 'CURRENT_COURSE'
+    _table_name_future = 'FUTURE_COURSE'
+    _table_name_current = 'CURRENT_COURSE'
 
     @staticmethod
     def get(db: DbQuery, idName: str, id: str, table: str):
@@ -19,7 +19,7 @@ class CourseDbHandler(DbHandler):
             data_list = db.get(table, idName, id)
             for obj in data_list:
                 data = CourseDbHandler.toJson(obj, table)
-                if table == CourseDbHandler._tabel_name_current:
+                if table == CourseDbHandler._table_name_current:
                     new_objs.append(CurrentCourse(data))
                 else:
                     new_objs.append(FutureCourse(data))
@@ -53,7 +53,7 @@ class CourseDbHandler(DbHandler):
 
     @staticmethod
     def toJson(array, table: str):
-        if table == CourseDbHandler._tabel_name_current:
+        if table == CourseDbHandler._table_name_current:
             data = {'courseID': array[0],
                     'courseName': array[1],
                     'creditHours': array[2],
@@ -77,7 +77,7 @@ class CourseDbHandler(DbHandler):
 
         if len(categories) == 0:
             course.setGrade(100)
-            CourseDbHandler.update(db, course, CourseDbHandler._tabel_name_current)
+            CourseDbHandler.update(db, course, CourseDbHandler._table_name_current)
             return
 
         total = 0
@@ -85,4 +85,4 @@ class CourseDbHandler(DbHandler):
             CategoryDbHandler.updateCategoryGrade(db, category)
             total += category.getCategoryGrade()*(category.getWeight()/100)
         course.setGrade(total)
-        CourseDbHandler.update(db, course, CourseDbHandler._tabel_name_current)
+        CourseDbHandler.update(db, course, CourseDbHandler._table_name_current)

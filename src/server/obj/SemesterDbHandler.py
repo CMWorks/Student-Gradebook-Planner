@@ -7,13 +7,13 @@ from obj.CurrentCourse import CurrentCourse
 
 class SemesterDbHandler(DbHandler):
 
-    _tabel_name = 'SEMESTER'
+    _table_name = 'SEMESTER'
 
     @staticmethod
     def get(db: DbQuery, idName: str, id: str):
         new_objs: list[Semester] = []
         try:
-            data_list = db.get(SemesterDbHandler._tabel_name, idName, id)
+            data_list = db.get(SemesterDbHandler._table_name, idName, id)
             for obj in data_list:
                 data = SemesterDbHandler.toJson(obj)
                 new_objs.append(Semester(data))
@@ -25,7 +25,7 @@ class SemesterDbHandler(DbHandler):
     @staticmethod
     def delete(db: DbQuery, idName: str, id) -> bool:
         try:
-            return db.delete(SemesterDbHandler._tabel_name, idName, id)
+            return db.delete(SemesterDbHandler._table_name, idName, id)
         except Exception:
             return False
 
@@ -33,7 +33,7 @@ class SemesterDbHandler(DbHandler):
     def add(db: DbQuery, obj: Semester) -> bool:
         try:
             dictData = obj.toJson()
-            return db.add(SemesterDbHandler._tabel_name, dictData)
+            return db.add(SemesterDbHandler._table_name, dictData)
         except Exception:
             return False
 
@@ -41,7 +41,7 @@ class SemesterDbHandler(DbHandler):
     def update(db: DbQuery, obj: Semester) -> bool:
         try:
             dictData = obj.toJson()
-            return db.update(SemesterDbHandler._tabel_name, dictData, 'semesterID', obj.getSemesterID())
+            return db.update(SemesterDbHandler._table_name, dictData, 'semesterID', obj.getSemesterID())
         except Exception:
             return False
 
