@@ -1,7 +1,4 @@
 class Semester:
-
-    _tabel_name = 'SEMESTER'
-
     def __init__(self, dictData: dict = None):
         if dictData is None:
             self.semesterID = -1

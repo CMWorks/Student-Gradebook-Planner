@@ -3,17 +3,17 @@ from database.dbQuery import DbQuery
 from obj.Assignment import Assignment
 
 
-class AssignmnetDbHandler(DbHandler):
+class AssignmentDbHandler(DbHandler):
 
-    _tabel_name = 'ASSIGNMENTS'
+    _table_name = 'ASSIGNMENTS'
 
     @staticmethod
     def get(db: DbQuery, idName: str, id: str):
         new_objs: list[Assignment] = []
         try:
-            data_list = db.get(AssignmnetDbHandler._tabel_name, idName, id)
+            data_list = db.get(AssignmentDbHandler._table_name, idName, id)
             for obj in data_list:
-                data = AssignmnetDbHandler.toJson(obj)
+                data = AssignmentDbHandler.toJson(obj)
                 new_objs.append(Assignment(data))
         except Exception as e:
             print(e)
@@ -24,7 +24,7 @@ class AssignmnetDbHandler(DbHandler):
     @staticmethod
     def delete(db: DbQuery, idName: str, id) -> bool:
         try:
-            return db.delete(AssignmnetDbHandler._tabel_name, idName, id)
+            return db.delete(AssignmentDbHandler._table_name, idName, id)
         except Exception:
             return False
 
@@ -32,7 +32,7 @@ class AssignmnetDbHandler(DbHandler):
     def add(db: DbQuery, obj: Assignment) -> bool:
         try:
             dictData = obj.toJson()
-            return db.add(AssignmnetDbHandler._tabel_name, dictData)
+            return db.add(AssignmentDbHandler._table_name, dictData)
         except Exception:
             return False
 
@@ -41,7 +41,7 @@ class AssignmnetDbHandler(DbHandler):
         obj.calculateGrade()
         try:
             dictData = obj.toJson()
-            return db.update(AssignmnetDbHandler._tabel_name, dictData, 'assignmentID', obj.getAssignmentID())
+            return db.update(AssignmentDbHandler._table_name, dictData, 'assignmentID', obj.getAssignmentID())
         except Exception:
             return False
 

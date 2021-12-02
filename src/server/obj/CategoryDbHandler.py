@@ -1,18 +1,18 @@
 from obj.DbHandler import DbHandler
 from database.dbQuery import DbQuery
 from obj.Category import Category
-from obj.AssignmnetDbHandler import AssignmnetDbHandler
+from obj.AssignmentDbHandler import AssignmentDbHandler
 
 
 class CategoryDbHandler(DbHandler):
 
-    _tabel_name = 'CATEGORIES'
+    _table_name = 'CATEGORIES'
 
     @staticmethod
     def get(db: DbQuery, idName: str, id: str):
         new_objs: list[Category] = []
         try:
-            data_list = db.get(CategoryDbHandler._tabel_name, idName, id)
+            data_list = db.get(CategoryDbHandler._table_name, idName, id)
             for obj in data_list:
                 data = CategoryDbHandler.toJson(obj)
                 new_objs.append(Category(data))
@@ -24,7 +24,7 @@ class CategoryDbHandler(DbHandler):
     @staticmethod
     def delete(db: DbQuery, idName: str, id) -> bool:
         try:
-            return db.delete(CategoryDbHandler._tabel_name, idName, id)
+            return db.delete(CategoryDbHandler._table_name, idName, id)
         except Exception:
             return False
 
@@ -32,7 +32,7 @@ class CategoryDbHandler(DbHandler):
     def add(db: DbQuery, obj: Category) -> bool:
         try:
             dictData = obj.toJson()
-            return db.add(CategoryDbHandler._tabel_name, dictData)
+            return db.add(CategoryDbHandler._table_name, dictData)
         except Exception:
             return False
 
@@ -40,7 +40,7 @@ class CategoryDbHandler(DbHandler):
     def update(db: DbQuery, obj: Category) -> bool:
         try:
             dictData = obj.toJson()
-            return db.update(CategoryDbHandler._tabel_name, dictData, 'categoryID', obj.getCategoryID())
+            return db.update(CategoryDbHandler._table_name, dictData, 'categoryID', obj.getCategoryID())
         except Exception:
             return False
 
