@@ -67,7 +67,7 @@ class CourseDbHandler(DbHandler):
                     'courseName': array[1],
                     'creditHours': array[2],
                     'plannedSemester': array[3],
-                    'userID': array[6]
+                    'userID': array[4]
                     }
 
         return data
