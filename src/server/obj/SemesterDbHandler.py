@@ -56,7 +56,7 @@ class SemesterDbHandler(DbHandler):
         return data
     
     def updateGPA(db, semester: Semester):
-        courses: list[CurrentCourse] = CourseDbHandler.get(db, 'semesterID', semester.semesterID, CourseDbHandler._tabel_name_current)
+        courses: list[CurrentCourse] = CourseDbHandler.get(db, 'semesterID', semester.semesterID, CourseDbHandler._table_name_current)
 
         if len(courses) == 0:
             semester.setGPA(4.0)
