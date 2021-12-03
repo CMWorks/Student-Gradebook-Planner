@@ -58,7 +58,7 @@ class CategoryDbHandler(DbHandler):
         return data
 
     def updateCategoryGrade(db, category: Category):
-        assignments = AssignmnetDbHandler.get(db, 'categoryID', category.categoryID)
+        assignments = AssignmentDbHandler.get(db, 'categoryID', category.categoryID)
 
         if len(assignments) == 0:
             category.setCategoryGrade(100)
