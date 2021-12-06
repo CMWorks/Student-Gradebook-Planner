@@ -1,20 +1,16 @@
 {
   "files": {
-    "main.css": "/static/css/main.318771d0.chunk.css",
-    "main.js": "/static/js/main.667c0b13.chunk.js",
-    "main.js.map": "/static/js/main.667c0b13.chunk.js.map",
-    "runtime-main.js": "/static/js/runtime-main.1f6c7cef.js",
-    "runtime-main.js.map": "/static/js/runtime-main.1f6c7cef.js.map",
-    "static/js/2.3b04ff44.chunk.js": "/static/js/2.3b04ff44.chunk.js",
-    "static/js/2.3b04ff44.chunk.js.map": "/static/js/2.3b04ff44.chunk.js.map",
-    "index.html": "/index.html",
-    "static/css/main.318771d0.chunk.css.map": "/static/css/main.318771d0.chunk.css.map",
-    "static/js/2.3b04ff44.chunk.js.LICENSE.txt": "/static/js/2.3b04ff44.chunk.js.LICENSE.txt"
+    "main.css": "/SGP/static/css/main.d7140410.chunk.css",
+    "main.js": "/SGP/static/js/main.91962750.chunk.js",
+    "runtime-main.js": "/SGP/static/js/runtime-main.3949b85c.js",
+    "static/js/2.87f63462.chunk.js": "/SGP/static/js/2.87f63462.chunk.js",
+    "index.html": "/SGP/index.html",
+    "static/js/2.87f63462.chunk.js.LICENSE.txt": "/SGP/static/js/2.87f63462.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
-    "static/js/runtime-main.1f6c7cef.js",
-    "static/js/2.3b04ff44.chunk.js",
-    "static/css/main.318771d0.chunk.css",
-    "static/js/main.667c0b13.chunk.js"
+    "static/js/runtime-main.3949b85c.js",
+    "static/js/2.87f63462.chunk.js",
+    "static/css/main.d7140410.chunk.css",
+    "static/js/main.91962750.chunk.js"
   ]
 }

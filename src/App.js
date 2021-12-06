@@ -1,9 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { Navigation, Footer, Home, About, Contact, Course, Login, Signup, Semesters, FinalGradeCalculator } from "./components";
+import { Navigation, Footer, Home, Course, Login, Signup, Semesters, FinalGradeCalculator } from "./components";
 import RESTModule from "./server/wpRESTModule";
-import AssignmentCategory from "./components/AssignmentCategory";
-import Assignment from "./components/Assignment";
 import FutureCourse from "./components/FutureCourse";
 
 class App extends React.Component {
@@ -12,7 +10,7 @@ class App extends React.Component {
     super(props)
     this.server = new RESTModule();
     this.server.obj = "App"
-    this.baseLocation = "http://localhost:3000/"
+    this.baseLocation = "/SGP/"
     this.state = {
       mode: "Login",
       user: {},
@@ -27,15 +25,13 @@ class App extends React.Component {
       return (
         <div className="App">
           <Router>
-            <Navigation userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />
+            <Navigation userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} baseLocation={this.baseLocation}/>
             <Switch>
-              <Route path="/" exact component={() => <Home userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
-              <Route path="/about" exact component={() => <About userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
-              <Route path="/contact" exact component={() => <Contact userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
-              <Route path="/semesters" exact component={() => <Semesters userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
-              <Route path="/future-courses" exact component={() => <FutureCourse userData={this.state.user}server={this.server}set={(obj) => this.setState(obj)} />} />
-              <Route path="/final-grade-calculator" exact component={() => <FinalGradeCalculator />} />
-              <Route path="/course" exact component={() => <Course userData={this.state.user} courseID={this.state.courseID} courseName={this.state.courseName} semesterID={this.state.semesterID} server={this.server} set={(obj) => this.setState(obj) } />} />
+              <Route path={this.baseLocation} exact component={() => <Home userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} />} />
+              <Route path={this.baseLocation+"semesters"} exact component={() => <Semesters userData={this.state.user} server={this.server} set={(obj) => this.setState(obj)} baseLocation={this.baseLocation}/>} />
+              <Route path={this.baseLocation+"future-courses"} exact component={() => <FutureCourse userData={this.state.user}server={this.server}set={(obj) => this.setState(obj)} />} />
+              <Route path={this.baseLocation+"final-grade-calculator"} exact component={() => <FinalGradeCalculator />} />
+              <Route path={this.baseLocation+"course"} exact component={() => <Course userData={this.state.user} courseID={this.state.courseID} courseName={this.state.courseName} semesterID={this.state.semesterID} server={this.server} set={(obj) => this.setState(obj) } />} />
             </Switch>
           </Router>
         </div>

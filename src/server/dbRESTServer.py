@@ -18,7 +18,7 @@ from obj.AssignmentDbHandler import AssignmentDbHandler
 
 api = Flask(__name__)
 
-white = ['http://localhost:3000', 'http://localhost:9000']
+white = ['http://localhost:3000', 'http://localhost:9000', 'https://cmworks.github.io']
 
 
 db = SQLQuery.getDbQuery("database/sqlData.txt")
@@ -29,8 +29,9 @@ auth = JWTAuth(db)
 @api.after_request
 def add_cors_headers(response: Response):
     if request.referrer is None:
-        return response
-    r = request.referrer[:-1]
+        r = 'https://cmworks.github.io'
+    else:
+        r = request.referrer[:-1]
     if r in white or True:
         response.headers.add('Access-Control-Allow-Origin', r)
         response.headers.add('Access-Control-Allow-Credentials', 'true')

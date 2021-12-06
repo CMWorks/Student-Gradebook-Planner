@@ -34,7 +34,7 @@ function Navigation(props) {
 
   const handleSignOut = () => { 
     setPopUpButtonAccountOptions(false); 
-    document.location.href = 'http://localhost:3000/'
+    document.location.href = props.baseLocation
     // console.log("Should sign out."); 
   }
   
@@ -46,7 +46,7 @@ function Navigation(props) {
     setPopUpButtonDeleteConfirmation(false);
     setPopUpButtonAccountOptions(false);
     let id = props.userData.userID;
-    props.server.deleteUserData('users', id).then( () => {document.location.href = 'http://localhost:3000/';} );
+    props.server.deleteUserData('users', id).then( () => {document.location.href = props.baseLocation;} );
     // console.log("Account should be deleted.");
   }
 
@@ -58,7 +58,7 @@ function Navigation(props) {
     <div className="navigation">
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <div className="container">
-          <Link className="navbar-brand" to="/">
+          <Link className="navbar-brand" to={props.baseLocation}>
             {"Student Planner & Gradebook"}
           </Link>
 
@@ -105,33 +105,23 @@ function Navigation(props) {
           <div>
             <ul className="navbar-nav ml-auto">
               <li className={`nav-item`}>
-                <Link className={'nav-link ' + (props.location.pathname === "/" ? "active" : "")} to="/">
+                <Link className={'nav-link ' + (props.location.pathname === props.baseLocation ? "active" : "")} to={props.baseLocation}>
                   Home
                   {/* <span className="sr-only">(current)</span> */}
                 </Link>
               </li>
               <li className={`nav-item`}>
-                <Link className={'nav-link ' + (props.location.pathname === "/about" ? "active" : "")} to="/about">
-                  About
-                </Link>
-              </li>
-              <li className={`nav-item`}>
-                <Link className={'nav-link ' + (props.location.pathname === "/contact" ? "active" : "")} to="/contact">
-                  Contact
-                </Link>
-              </li>
-              <li className={`nav-item`}>
-                <Link className={'nav-link ' + (props.location.pathname === "/semesters" ? "active" : "")} to="/semesters">
+                <Link className={'nav-link ' + (props.location.pathname === props.baseLocation+"semesters" ? "active" : "")} to={props.baseLocation+"semesters"}>
                   Semesters
                 </Link>
               </li>
               <li className={'nav-item'}>
-                <Link className={'nav-link ' + (props.location.pathname === "/final-grade-calculator" ? "active" : "")} to="/final-grade-calculator">
+                <Link className={'nav-link ' + (props.location.pathname === props.baseLocation+"final-grade-calculator" ? "active" : "")} to={props.baseLocation+"final-grade-calculator"}>
                   Final Grade Calculator
                 </Link>
               </li>
               <li className = {'nav-item'}>
-                <Link className = {'nav-link ' + (props.location.pathname === "/future-courses" ? "active" : "")} to = "/future-courses">
+                <Link className = {'nav-link ' + (props.location.pathname === props.baseLocation+"future-courses" ? "active" : "")} to={props.baseLocation+"future-courses"}>
                   Planned Courses
                   </Link>
               </li>

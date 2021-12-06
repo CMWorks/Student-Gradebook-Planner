@@ -65,26 +65,26 @@ class SQLQuery(DbQuery):
         return out
 
     def update(self, table, dicData: dict, id_name, id):
-        self.conn = self.dbConnect.connect()
-        command = f"update {table} set "
-        for key, value in dicData.items():
-            command += f"{key} = '{value}',"
+        while True:
+            try:
+                self.conn = self.dbConnect.connect()
+                command = f"update {table} set "
+                for key, value in dicData.items():
+                    command += f"{key} = '{value}',"
 
-        # remove the last comma and add ending )
-        command = command[:-1] + f" where {id_name} = '{id}'"
+                # remove the last comma and add ending )
+                command = command[:-1] + f" where {id_name} = '{id}'"
 
-        try:
-            self.conn.execute(command)
-        except Exception as e:
-            print(e)
-            self.conn.close()
-            return False
-        out = True
-        if self.conn.total_changes == 0:
-            out = False
-        self.conn.commit()
-        self.conn.close()
-        return out
+                self.conn.execute(command)
+                out = True
+                if self.conn.total_changes == 0:
+                    out = False
+                self.conn.commit()
+                self.conn.close()
+                return out
+            except Exception:
+                self.conn.close()
+                print("Error - retrying update command")
 
     def delete(self, table, id_name, id):
         self.conn = self.dbConnect.connect()
