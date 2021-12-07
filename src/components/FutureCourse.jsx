@@ -204,7 +204,7 @@ class FutureCourse extends React.Component{
                         
                         <form className="form-floating" onSubmit={this.handleSubmitEditFutureCourse}>
                             <div className="mb-3">
-                                <label htmlFor="category">Category</label>
+                                <label htmlFor="category">Course</label>
                                 <select className="form-control" onChange={this.handleChangeFutureCourseID}>\
                                     <option value=''></option>
                                     {this.state.futureCourses.map((futureCourse) => (
